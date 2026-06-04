@@ -292,7 +292,7 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
             if (!narrative) return null;
             return (
               <Link key={name} href={`/teams/${teamSlug(name)}`}>
-                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream transition-colors cursor-pointer">
+                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-[#F0F5EA] hover:border-l-2 hover:border-l-pitch-green transition-colors cursor-pointer">
                   <div className="flex items-start gap-2">
                     <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
                     <div>
@@ -336,7 +336,7 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
             if (!narrative) return null;
             return (
               <Link key={name} href={`/teams/${teamSlug(name)}`}>
-                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream transition-colors cursor-pointer">
+                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-[#F0F5EA] hover:border-l-2 hover:border-l-pitch-green transition-colors cursor-pointer">
                   <div className="flex items-start gap-2">
                     <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
                     <div>
@@ -512,7 +512,7 @@ function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof g
             if (!narrative) return null;
             return (
               <Link key={name} href={`/teams/${teamSlug(name)}`}>
-                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream transition-colors cursor-pointer">
+                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-[#F0F5EA] hover:border-l-2 hover:border-l-pitch-green transition-colors cursor-pointer">
                   <div className="flex items-start gap-2">
                     <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
                     <div>
@@ -540,7 +540,7 @@ function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof g
             if (!narrative) return null;
             return (
               <Link key={name} href={`/teams/${teamSlug(name)}`}>
-                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream transition-colors cursor-pointer">
+                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-[#F0F5EA] hover:border-l-2 hover:border-l-pitch-green transition-colors cursor-pointer">
                   <div className="flex items-start gap-2">
                     <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
                     <div>

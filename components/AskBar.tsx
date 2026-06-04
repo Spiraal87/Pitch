@@ -207,12 +207,14 @@ export default function AskBar({
               onKeyDown={handleKeyDown}
               placeholder={remaining > 0 ? placeholder : 'No questions remaining this session'}
               disabled={remaining <= 0}
-              className="flex-1 font-sans text-[13px] bg-pitch-white border border-pitch-rule rounded-[20px] px-4 py-2.5 text-pitch-ink placeholder-pitch-ink-light focus:outline-none focus:border-pitch-green focus:ring-2 focus:ring-pitch-green/10 disabled:opacity-50"
+              className="flex-1 font-sans text-[13px] sm:text-[13px] bg-pitch-white border border-pitch-rule rounded-[20px] px-4 py-2.5 text-pitch-ink placeholder-pitch-ink-light focus:outline-none focus:border-pitch-green focus:ring-2 focus:ring-pitch-green/10 disabled:opacity-50"
+              style={{ fontSize: '16px' }}
             />
             <button
               onClick={() => handleAsk()}
               disabled={!question.trim() || loading || remaining <= 0}
-              className="font-sans text-[13px] font-medium bg-pitch-green text-white rounded-[20px] px-5 py-2.5 hover:bg-pitch-green-mid active:scale-95 disabled:opacity-40 whitespace-nowrap shadow-sm"
+              className="font-sans text-[13px] font-medium bg-pitch-green text-white rounded-[20px] px-5 py-2.5 hover:bg-pitch-green-mid active:scale-95 disabled:opacity-40 whitespace-nowrap shadow-sm touch-action-manipulation"
+              style={{ touchAction: 'manipulation' }}
             >
               {loading ? '…' : 'Ask'}
             </button>

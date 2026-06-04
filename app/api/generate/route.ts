@@ -6,11 +6,11 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 async function generateTeamBio(name: string): Promise<string> {
   const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5',
+    model: 'claude-sonnet-4-6',
     max_tokens: 200,
     messages: [{
       role: 'user',
-      content: `Write a 2-3 sentence plain English summary of ${name} for someone who doesn't follow soccer closely. Cover: what kind of team are they, what's their story going into this World Cup, and one thing to watch for. Casual tone, no jargon. Don't start with the team name.`,
+      content: `Write a 2-3 sentence plain English summary of ${name} for someone who doesn't follow soccer closely. Cover: what kind of team are they, what's their story going into the 2026 World Cup, and one thing to watch for. Casual tone, no jargon. Don't start with the team name.`,
     }],
   });
   return (msg.content[0] as { type: string; text: string }).text;
@@ -22,11 +22,11 @@ async function generatePlayerBio(
   position: string
 ): Promise<string> {
   const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5',
+    model: 'claude-sonnet-4-6',
     max_tokens: 250,
     messages: [{
       role: 'user',
-      content: `Write a 3-4 sentence plain English bio of ${name} (${team}, ${position}) for someone who doesn't follow soccer. Cover: what makes them special, why they matter at this World Cup, what a casual fan should watch for. Casual tone. Don't start with the player's name.`,
+      content: `Write a 3-4 sentence plain English bio of ${name} (${team}, ${position}) for someone who doesn't follow soccer. Cover: what makes them special, why they matter at the 2026 World Cup, what a casual fan should watch for. Casual tone. Don't start with the player's name.`,
     }],
   });
   return (msg.content[0] as { type: string; text: string }).text;
