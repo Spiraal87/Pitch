@@ -1,101 +1,548 @@
-import Image from "next/image";
+import { supabase } from '@/lib/supabase';
+import { isTournamentLive, teamSlug } from '@/lib/utils';
+import { Player, Match, Standing, Team } from '@/lib/types';
+import Masthead from '@/components/Masthead';
+import SectionFlag from '@/components/SectionFlag';
+import AskBar from '@/components/AskBar';
+import MatchCard from '@/components/MatchCard';
+import PlayerCard from '@/components/PlayerCard';
+import GroupCard from '@/components/GroupCard';
+import UpcomingMatches from '@/components/UpcomingMatches';
+import AllGroupsStandings from '@/components/AllGroupsStandings';
+import TournamentLeaders from '@/components/TournamentLeaders';
+import PageNav from '@/components/PageNav';
+import WorldCupBanner from '@/components/WorldCupBanner';
+import TeamFinder from '@/components/TeamFinder';
+import Link from 'next/link';
 
-export default function Home() {
+const FEATURED_TEAM_ORDER = ['Spain', 'Argentina', 'France', 'Brazil', 'England', 'Norway'];
+
+const TEAM_NARRATIVES: Record<string, { label: string; body: string }> = {
+  Spain: {
+    label: 'Favorites',
+    body: 'Spain are built around 18-year-old Lamine Yamal, arguably the most exciting teenager in world football. Reigning European champions, technically brilliant, and terrifyingly deep. Watch whether their youth can hold up when knockout pressure arrives.',
+  },
+  Argentina: {
+    label: 'Defending champions',
+    body: "Messi's final World Cup felt like fate in 2022 — this one is the victory lap. Argentina arrive as the team to beat, with a settled squad built around their greatest ever player. The question isn't if they'll go deep; it's who can stop them.",
+  },
+  France: {
+    label: 'Contenders',
+    body: "Les Bleus have the most individually gifted squad in the tournament. Mbappé, Griezmann, Camavinga — names that mean something even if you've never watched a match. They've come close twice in a row and this feels like their moment.",
+  },
+  Brazil: {
+    label: 'The entertainers',
+    body: "It's been over two decades since Brazil won a World Cup, an eternity for the most successful nation in tournament history. Vinicius Jr is the talisman — electric, unpredictable, impossible to stop when he's on. The pressure of a nation rides with them.",
+  },
+  England: {
+    label: 'The nearly men',
+    body: "England have been heartbreakingly close in back-to-back major tournaments. This squad is genuinely world class — Saka, Bellingham, Kane — but can they finally get over the line? The nation oscillates between belief and bracing for disappointment.",
+  },
+  Norway: {
+    label: 'Outsiders worth watching',
+    body: "Norway haven't been to a World Cup since 1998, and they got here almost entirely because of Erling Haaland. The world's best striker, playing at his first World Cup, with everything to prove. Pure sporting storyline.",
+  },
+};
+
+const UNDERDOG_ORDER = ['Morocco', 'USA', 'Japan', 'Senegal', 'Croatia'];
+
+const UNDERDOG_NARRATIVES: Record<string, { label: string; body: string }> = {
+  Morocco: {
+    label: 'Africa\'s finest',
+    body: "In 2022 they became the first African nation to reach a World Cup semi-final. That wasn't a fluke — this is a well-organised, defensively superb team that nobody enjoys playing. The question is whether they can go one better.",
+  },
+  USA: {
+    label: 'Home advantage',
+    body: "Playing on home soil for the first time since 1994, and this US squad is the most talented in a generation. Pulisic, Reyna, McKennie — genuinely good players, not just hopeful ones. The crowd will carry them further than their ranking suggests.",
+  },
+  Japan: {
+    label: 'The giant killers',
+    body: "Japan keep doing things they're not supposed to do. They beat Germany and Spain in 2022. They press relentlessly, defend as a unit, and play without fear. Don't look away when they're on.",
+  },
+  Senegal: {
+    label: 'Mané\'s redemption',
+    body: "Sadio Mané missed the 2022 World Cup through injury — one of the cruelest moments in recent tournament history. He's back, he's hungry, and Senegal have the defensive organisation to go deep if the attack clicks.",
+  },
+  Croatia: {
+    label: 'Last dance',
+    body: "Luka Modrić is 40 years old and still running midfields. Croatia have punched above their weight for a decade on his back. This will almost certainly be his final World Cup, and he has a habit of saving his best for the biggest stages.",
+  },
+};
+
+const HOW_IT_WORKS = [
+  {
+    label: 'The format',
+    body: "48 teams are split into 12 groups of 4. Each team plays the other 3 once. The top two from each group advance — that's 24 teams into a knockout bracket. Win or go home from there.",
+  },
+  {
+    label: 'Why 48 teams?',
+    body: "FIFA expanded the tournament from 32 teams for 2026. More nations, more stories, more upsets. Critics say it waters down the group stage; fans say it brings in the whole world. You'll have a view by the end.",
+  },
+];
+
+const GENERAL_FAQ = [
+  {
+    label: 'When is the 2026 World Cup?',
+    body: 'The tournament begins on June 11, 2026 and runs through the final in July. It is the first men\'s World Cup with 48 teams.',
+  },
+  {
+    label: 'Where is it being played?',
+    body: 'The 2026 World Cup is co-hosted by the United States, Canada, and Mexico. Matches will be spread across host cities in all three countries.',
+  },
+  {
+    label: 'How do teams advance?',
+    body: 'Each team plays three group-stage matches. The top two teams in every group, plus the eight best third-place teams, move on to the knockout rounds.',
+  },
+  ...HOW_IT_WORKS.map((item) => ({
+    label: item.label === 'The format' ? 'What is the World Cup format?' : item.label,
+    body: item.body,
+  })),
+  {
+    label: 'Why does this World Cup feel different?',
+    body: 'It is the biggest World Cup ever, with more teams, more host cities, and more matches than any previous edition. That means more underdogs, more travel, and a much wider range of storylines.',
+  },
+];
+
+async function getHomeData(forceLive = false) {
+  const live = isTournamentLive() || forceLive;
+
+  if (!live) {
+    const [teamsRes, standingsRes] = await Promise.all([
+      supabase
+        .from('teams')
+        .select('id, name, group_letter, fifa_rank, bio_text, is_featured, generated_at, created_at')
+        .order('name'),
+      supabase
+        .from('standings')
+        .select('*, team:teams(*)')
+        .in('group_letter', ['A', 'B', 'C', 'D']),
+    ]);
+
+    return {
+      live,
+      teams: teamsRes.data ?? [],
+      standings: standingsRes.data ?? [],
+      todayMatches: [],
+      yesterdayMatches: [],
+      players: [],
+    };
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+
+  const threeDaysOut = new Date(today);
+  threeDaysOut.setDate(today.getDate() + 4);
+
+  const [teamsRes, todayRes, yesterdayRes, upcomingRes, allStandingsRes, topPlayersRes, playersRes] = await Promise.all([
+    supabase
+      .from('teams')
+      .select('id, name, group_letter, fifa_rank, bio_text, is_featured, generated_at, created_at')
+      .order('name'),
+    supabase
+      .from('matches')
+      .select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)')
+      .gte('date', today.toISOString())
+      .lt('date', tomorrow.toISOString())
+      .order('date'),
+    supabase
+      .from('matches')
+      .select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)')
+      .gte('date', yesterday.toISOString())
+      .lt('date', today.toISOString())
+      .order('date'),
+    supabase
+      .from('matches')
+      .select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)')
+      .gte('date', tomorrow.toISOString())
+      .lte('date', threeDaysOut.toISOString())
+      .order('date')
+      .limit(12),
+    supabase
+      .from('standings')
+      .select('*, team:teams(*)')
+      .order('group_letter')
+      .order('points', { ascending: false }),
+    supabase
+      .from('players')
+      .select('id, name, position, goals, assists, team:teams(name, group_letter)')
+      .or('goals.gt.0,assists.gt.0')
+      .order('goals', { ascending: false })
+      .limit(20),
+    supabase
+      .from('players')
+      .select('*, team:teams(*)')
+      .eq('is_featured', true)
+      .limit(3),
+  ]);
+
+  return {
+    live,
+    teams: teamsRes.data ?? [],
+    standings: allStandingsRes.data ?? [],
+    todayMatches: todayRes.data ?? [],
+    yesterdayMatches: yesterdayRes.data ?? [],
+    upcomingMatches: upcomingRes.data ?? [],
+    topPlayers: topPlayersRes.data ?? [],
+    players: playersRes.data ?? [],
+  };
+}
+
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage({ searchParams }: { searchParams: { live?: string } }) {
+  const forceLive = searchParams.live === '1';
+  const data = await getHomeData(forceLive);
+  const isLive = data.live;
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+    <>
+      {isLive
+        ? <TournamentHome data={data} />
+        : <PreTournamentHome data={data} />
+      }
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed top-20 right-3 z-50">
           <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href={isLive ? '/' : '/?live=1'}
+            className="font-sans text-[10px] px-2 py-1 rounded bg-pitch-ink text-white opacity-50 hover:opacity-100 transition-opacity"
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
+            {isLive ? 'Preview: pre-tournament' : 'Preview: live'}
           </a>
         </div>
+      )}
+    </>
+  );
+}
+
+function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeData>> }) {
+  const allTeams = data.teams as Team[];
+
+  const standingsByGroup = (data.standings as Standing[]).reduce<Record<string, Standing[]>>(
+    (acc, s) => {
+      const g = s.group_letter ?? 'A';
+      if (!acc[g]) acc[g] = [];
+      acc[g].push(s);
+      return acc;
+    },
+    {}
+  );
+
+  return (
+    <>
+      <Masthead />
+      <WorldCupBanner />
+      <div className="max-w-[640px] mx-auto">
+        <PageNav items={[
+          { label: 'Teams to watch', href: '#teams' },
+          { label: 'Underdogs', href: '#underdogs' },
+          { label: 'FAQ', href: '#faq' },
+          { label: 'Groups', href: '#groups' },
+        ]} />
+      </div>
+      <main className="max-w-[640px] mx-auto pb-32">
+        {/* Hero */}
+        <div className="px-[18px] py-6 text-center">
+          <p className="font-sans text-[13px] text-pitch-ink-mid leading-[1.5] mb-6">
+            48 teams. 3 host nations. One trophy. Here&apos;s everything you need to understand what&apos;s happening.
+          </p>
+          <Link
+            href="/briefing"
+            className="block w-full max-w-[calc(100%-36px)] mx-auto bg-pitch-green text-white font-sans text-[13px] font-medium py-3 rounded-lg hover:bg-pitch-green-mid hover:shadow-md hover:-translate-y-0.5 transition-all text-center"
+          >
+            Get me up to speed
+          </Link>
+          <TeamFinder teams={allTeams} />
+        </div>
+
+        <div className="border-t border-pitch-rule" />
+
+        {/* Teams to watch */}
+        <div id="teams" />
+        <SectionFlag label="Teams to watch" linkText="All groups" linkHref="/groups" />
+        <div>
+          {FEATURED_TEAM_ORDER.map((name) => {
+            const narrative = TEAM_NARRATIVES[name];
+            if (!narrative) return null;
+            return (
+              <Link key={name} href={`/teams/${teamSlug(name)}`}>
+                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream transition-colors cursor-pointer">
+                  <div className="flex items-start gap-2">
+                    <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-0.5">
+                        {narrative.label}
+                      </p>
+                      <p className="font-sans text-[13px] text-pitch-ink leading-[1.5]">
+                        <span className="font-medium">{name}</span> —{' '}
+                        {narrative.body}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="border-t-2 border-pitch-rule mt-6" />
+
+        {/* Underdogs to watch */}
+        <div id="underdogs" />
+        <SectionFlag label="Underdogs to watch" />
+        <div>
+          {UNDERDOG_ORDER.map((name) => {
+            const narrative = UNDERDOG_NARRATIVES[name];
+            if (!narrative) return null;
+            return (
+              <Link key={name} href={`/teams/${teamSlug(name)}`}>
+                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream transition-colors cursor-pointer">
+                  <div className="flex items-start gap-2">
+                    <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-0.5">
+                        {narrative.label}
+                      </p>
+                      <p className="font-sans text-[13px] text-pitch-ink leading-[1.5]">
+                        <span className="font-medium">{name}</span> — {narrative.body}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="border-t-2 border-pitch-rule mt-6" />
+
+        {/* Groups at a glance */}
+        <div id="groups" />
+        <SectionFlag label="Groups at a glance" linkText="All groups" linkHref="/groups" />
+        <div className="px-[18px] pb-6">
+          <div className="grid grid-cols-2 gap-3">
+            {Object.entries(standingsByGroup).slice(0, 4).map(([group, standings]) => (
+              <GroupCard key={group} group={group} standings={standings} showFavorite />
+            ))}
+          </div>
+          {Object.keys(standingsByGroup).length === 0 && (
+            <div className="grid grid-cols-2 gap-3">
+              {['A', 'B', 'C', 'D'].map((g) => (
+                <Link key={g} href={`/groups/${g.toLowerCase()}`}>
+                  <div className="bg-pitch-cream border border-pitch-rule rounded-lg p-3 hover:border-pitch-green-accent transition-colors">
+                    <p className="font-sans text-[10px] uppercase font-medium tracking-[0.08em] text-pitch-green-mid mb-2">
+                      Group {g}
+                    </p>
+                    <p className="font-sans text-[12px] text-pitch-ink-light">View group →</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <FaqSection />
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      <AskBar placeholder="Who should I watch? What's at stake?" />
+    </>
+  );
+}
+
+function TournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeData>> }) {
+  const completedMatches = [...(data.todayMatches as Match[]), ...(data.yesterdayMatches as Match[])].filter(
+    (m) => m.home_score !== null
+  );
+  const allTeams = data.teams as Team[];
+
+  return (
+    <>
+      <Masthead />
+      <WorldCupBanner />
+      <div className="max-w-[640px] mx-auto">
+        <PageNav items={[
+          { label: 'Today', href: '#today' },
+          { label: 'Up next', href: '#upcoming' },
+          { label: 'Standings', href: '#standings' },
+          { label: 'Leaders', href: '#leaders' },
+          { label: 'Players', href: '#players' },
+          { label: 'Underdogs', href: '#underdogs' },
+          { label: 'Teams', href: '#teams' },
+          { label: 'FAQs', href: '#how' },
+        ]} />
+      </div>
+      <main className="max-w-[640px] mx-auto pb-32">
+        {/* Catch me up */}
+        <div className="px-[18px] pt-4 pb-2">
+          <Link
+            href="/briefing"
+            className="block w-full bg-pitch-green text-white font-sans text-[13px] font-medium py-3 rounded-lg hover:bg-pitch-green-mid transition-colors text-center"
+          >
+            Catch me up
+          </Link>
+          <TeamFinder teams={allTeams} />
+        </div>
+
+        {/* Today's matches */}
+        <div id="today" />
+        <SectionFlag label="Today's matches" />
+        {data.todayMatches.length > 0 ? (
+          (data.todayMatches as Match[]).map((m) => <MatchCard key={m.id} match={m} />)
+        ) : (
+          <p className="px-[18px] py-3 font-sans text-[13px] text-pitch-ink-light border-b border-pitch-rule">
+            No matches today.
+          </p>
+        )}
+
+        {/* Yesterday's results */}
+        <div className="border-t-2 border-pitch-rule mt-4" />
+        <SectionFlag label="Yesterday's results" />
+        {data.yesterdayMatches.length > 0 ? (
+          (data.yesterdayMatches as Match[]).map((m) => <MatchCard key={m.id} match={m} compact />)
+        ) : (
+          <p className="px-[18px] py-3 font-sans text-[13px] text-pitch-ink-light border-b border-pitch-rule">
+            No results yet.
+          </p>
+        )}
+
+        {/* Up next */}
+        <div id="upcoming" />
+        <div className="border-t-2 border-pitch-rule mt-4" />
+        <SectionFlag label="Up next" linkText="Full schedule" linkHref="/schedule" />
+        {(data as { upcomingMatches?: Match[] }).upcomingMatches?.length ? (
+          <UpcomingMatches matches={(data as { upcomingMatches: Match[] }).upcomingMatches} />
+        ) : (
+          <p className="px-[18px] py-3 font-sans text-[13px] text-pitch-ink-light border-b border-pitch-rule">
+            No upcoming fixtures in the next few days.
+          </p>
+        )}
+
+        {/* All group standings */}
+        <div id="standings" />
+        <div className="border-t-2 border-pitch-rule mt-4" />
+        <SectionFlag label="Group standings" linkText="All groups" linkHref="/groups" />
+        {data.standings.length > 0 ? (
+          <AllGroupsStandings standings={data.standings as Standing[]} />
+        ) : (
+          <p className="px-[18px] py-3 font-sans text-[13px] text-pitch-ink-light border-b border-pitch-rule">
+            Standings will update as matches are played.
+          </p>
+        )}
+
+        {/* Tournament leaders */}
+        <div id="leaders" />
+        <>
+          <div className="border-t-2 border-pitch-rule mt-4" />
+          <SectionFlag label="Tournament leaders" />
+          <TournamentLeaders
+            topPlayers={(data as { topPlayers?: [] }).topPlayers ?? []}
+            completedMatches={completedMatches}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        </>
+
+        {/* Players to know */}
+        <div id="players" />
+        {data.players.length > 0 && (
+          <>
+            <div className="border-t-2 border-pitch-rule mt-4" />
+            <SectionFlag label="Players to know" linkText="More" linkHref="/groups" />
+            {(data.players as Player[]).map((p) => (
+              <PlayerCard key={p.id} player={p} showTeam />
+            ))}
+          </>
+        )}
+
+        {/* Underdogs to watch */}
+        <div id="underdogs" />
+        <div className="border-t-2 border-pitch-rule mt-6" />
+        <SectionFlag label="Underdogs to watch" />
+        <div>
+          {UNDERDOG_ORDER.map((name) => {
+            const narrative = UNDERDOG_NARRATIVES[name];
+            if (!narrative) return null;
+            return (
+              <Link key={name} href={`/teams/${teamSlug(name)}`}>
+                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream transition-colors cursor-pointer">
+                  <div className="flex items-start gap-2">
+                    <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-0.5">
+                        {narrative.label}
+                      </p>
+                      <p className="font-sans text-[13px] text-pitch-ink leading-[1.5]">
+                        <span className="font-medium">{name}</span> — {narrative.body}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Teams to watch */}
+        <div id="teams" />
+        <div className="border-t-2 border-pitch-rule mt-6" />
+        <SectionFlag label="Teams to watch" linkText="All groups" linkHref="/groups" />
+        <div>
+          {FEATURED_TEAM_ORDER.map((name) => {
+            const narrative = TEAM_NARRATIVES[name];
+            if (!narrative) return null;
+            return (
+              <Link key={name} href={`/teams/${teamSlug(name)}`}>
+                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream transition-colors cursor-pointer">
+                  <div className="flex items-start gap-2">
+                    <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-0.5">
+                        {narrative.label}
+                      </p>
+                      <p className="font-sans text-[13px] text-pitch-ink leading-[1.5]">
+                        <span className="font-medium">{name}</span> — {narrative.body}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        <FaqSection />
+      </main>
+      <AskBar />
+    </>
+  );
+}
+
+function FaqSection() {
+  return (
+    <>
+      <div id="faq" />
+      <div className="border-t-2 border-pitch-rule mt-6" />
+      <SectionFlag label="World Cup FAQ" />
+      <div className="border-b border-pitch-rule">
+        {GENERAL_FAQ.map((item) => (
+          <details key={item.label} className="group border-t border-pitch-rule first:border-t-0">
+            <summary className="list-none cursor-pointer px-[18px] py-4">
+              <div className="flex items-start justify-between gap-4">
+                <p className="font-sans text-[13px] font-medium text-pitch-ink leading-[1.5]">
+                  {item.label}
+                </p>
+                <span className="font-sans text-[18px] leading-none text-pitch-green transition-transform group-open:rotate-45">
+                  +
+                </span>
+              </div>
+            </summary>
+            <div className="px-[18px] pb-4">
+              <p className="font-sans text-[13px] text-pitch-ink-mid leading-[1.6]">{item.body}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    </>
   );
 }

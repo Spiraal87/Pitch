@@ -3,25 +3,49 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --pitch-green:        #2D5016;
+  --pitch-green-mid:    #3B6B1E;
+  --pitch-green-light:  #EBF2E3;
+  --pitch-green-accent: #5A8A28;
+  --pitch-cream:        #FAFAF7;
+  --pitch-ink:          #1A1A18;
+  --pitch-ink-mid:      #4A4A46;
+  --pitch-ink-light:    #8A8A85;
+  --pitch-rule:         #E2E2DC;
+  --pitch-white:        #FFFFFF;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--pitch-cream);
+  color: var(--pitch-ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* Global smooth transitions for all interactive elements */
+a, button {
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease, opacity 150ms ease;
+}
+
+/* Subtle custom scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--pitch-rule); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--pitch-ink-light); }
+
+/* Selection highlight in brand color */
+::selection { background: var(--pitch-green-light); color: var(--pitch-green); }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  /* Card hover lift — reusable utility */
+  .card-hover {
+    transition: box-shadow 150ms ease, transform 150ms ease;
+  }
+  .card-hover:hover {
+    box-shadow: 0 4px 12px rgba(26, 26, 24, 0.08);
+    transform: translateY(-1px);
   }
 }
