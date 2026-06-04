@@ -172,7 +172,7 @@ export default function AskBar({
         className="fixed left-0 right-0 z-50 bg-pitch-cream border-t-2 border-pitch-green"
         style={{ bottom: `${footerOffset}px` }}
       >
-        <div className="max-w-[640px] mx-auto p-4">
+        <div className="max-w-[640px] mx-auto px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
 
           {/* Label + suggestions row */}
           {!open && remaining > 0 && (
