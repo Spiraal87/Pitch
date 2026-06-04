@@ -13,6 +13,7 @@ import TournamentLeaders from '@/components/TournamentLeaders';
 import PageNav from '@/components/PageNav';
 import WorldCupBanner from '@/components/WorldCupBanner';
 import TeamFinder from '@/components/TeamFinder';
+import FaqAccordion from '@/components/FaqAccordion';
 import Link from 'next/link';
 
 const FEATURED_TEAM_ORDER = ['Spain', 'Argentina', 'France', 'Brazil', 'England', 'Norway'];
@@ -107,7 +108,7 @@ async function getHomeData(forceLive = false) {
   const live = isTournamentLive() || forceLive;
 
   if (!live) {
-    const [teamsRes, standingsRes] = await Promise.all([
+    const [teamsRes, standingsRes, playersRes] = await Promise.all([
       supabase
         .from('teams')
         .select('id, name, group_letter, fifa_rank, bio_text, is_featured, generated_at, created_at')
@@ -116,6 +117,12 @@ async function getHomeData(forceLive = false) {
         .from('standings')
         .select('*, team:teams(*)')
         .in('group_letter', ['A', 'B', 'C', 'D']),
+      supabase
+        .from('players')
+        .select('*, team:teams(*)')
+        .eq('is_featured', true)
+        .in('id', ['lionel-messi', 'erling-haaland', 'kylian-mbappe', 'lamine-yamal', 'vinicius-jr', 'cristiano-ronaldo', 'jude-bellingham', 'bukayo-saka', 'christian-pulisic', 'harry-kane'])
+        .limit(10),
     ]);
 
     return {
@@ -124,7 +131,7 @@ async function getHomeData(forceLive = false) {
       standings: standingsRes.data ?? [],
       todayMatches: [],
       yesterdayMatches: [],
-      players: [],
+      players: playersRes.data ?? [],
     };
   }
 
@@ -177,7 +184,7 @@ async function getHomeData(forceLive = false) {
       .from('players')
       .select('*, team:teams(*)')
       .eq('is_featured', true)
-      .limit(3),
+      .limit(10),
   ]);
 
   return {
@@ -198,23 +205,14 @@ export default async function HomePage({ searchParams }: { searchParams: { live?
   const forceLive = searchParams.live === '1';
   const data = await getHomeData(forceLive);
   const isLive = data.live;
+  const isPreview = forceLive && !data.live;
 
   return (
     <>
-      {isLive
-        ? <TournamentHome data={data} />
+      {(isLive || forceLive)
+        ? <TournamentHome data={data} isPreview={isPreview} />
         : <PreTournamentHome data={data} />
       }
-      {process.env.NODE_ENV === 'development' && (
-        <div className="fixed top-20 right-3 z-50">
-          <a
-            href={isLive ? '/' : '/?live=1'}
-            className="font-sans text-[10px] px-2 py-1 rounded bg-pitch-ink text-white opacity-50 hover:opacity-100 transition-opacity"
-          >
-            {isLive ? 'Preview: pre-tournament' : 'Preview: live'}
-          </a>
-        </div>
-      )}
     </>
   );
 }
@@ -239,12 +237,13 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
       <div className="max-w-[640px] mx-auto">
         <PageNav items={[
           { label: 'Teams to watch', href: '#teams' },
+          { label: 'Players', href: '#players' },
           { label: 'Underdogs', href: '#underdogs' },
           { label: 'FAQ', href: '#faq' },
           { label: 'Groups', href: '#groups' },
         ]} />
       </div>
-      <main className="max-w-[640px] mx-auto pb-32">
+      <main className="max-w-[640px] mx-auto pb-52">
         {/* Hero */}
         <div className="px-[18px] py-6 text-center">
           <p className="font-sans text-[13px] text-pitch-ink-mid leading-[1.5] mb-6">
@@ -260,6 +259,24 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
         </div>
 
         <div className="border-t border-pitch-rule" />
+
+        {/* Live June 11 teaser */}
+        <div className="mx-[18px] mb-4 bg-pitch-green-light/50 border border-pitch-green-light rounded-lg p-4">
+          <p className="font-sans text-[11px] uppercase tracking-[0.10em] text-pitch-green font-medium mb-1">
+            Live from June 11, 2026
+          </p>
+          <p className="font-sans text-[13px] text-pitch-ink-mid leading-[1.6] mb-3">
+            Scores, standings, match recaps, and daily briefings go live when the tournament starts. Preview the experience now.
+          </p>
+          <Link
+            href="/?live=1"
+            className="inline-flex items-center gap-1.5 font-sans text-[13px] font-medium text-pitch-green hover:text-pitch-green-mid"
+          >
+            Preview the live experience →
+          </Link>
+        </div>
+
+        <div className="border-t-2 border-pitch-rule" />
 
         {/* Teams to watch */}
         <div id="teams" />
@@ -288,6 +305,20 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
             );
           })}
         </div>
+
+        <div className="border-t-2 border-pitch-rule mt-6" />
+
+        {/* Players to know */}
+        <div id="players" />
+        <SectionFlag label="Players to know" linkText="All players" linkHref="/players" />
+        {(data.players as Player[]).slice(0, 3).map((p) => (
+          <PlayerCard key={p.id} player={p} showTeam />
+        ))}
+        {data.players.length === 0 && (
+          <p className="px-[18px] py-3 font-sans text-[13px] text-pitch-ink-light border-b border-pitch-rule">
+            Player profiles coming soon.
+          </p>
+        )}
 
         <div className="border-t-2 border-pitch-rule mt-6" />
 
@@ -352,7 +383,7 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
   );
 }
 
-function TournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeData>> }) {
+function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof getHomeData>>; isPreview?: boolean }) {
   const completedMatches = [...(data.todayMatches as Match[]), ...(data.yesterdayMatches as Match[])].filter(
     (m) => m.home_score !== null
   );
@@ -374,7 +405,18 @@ function TournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeData>
           { label: 'FAQs', href: '#how' },
         ]} />
       </div>
-      <main className="max-w-[640px] mx-auto pb-32">
+      <main className="max-w-[640px] mx-auto pb-52">
+        {/* Preview banner */}
+        {isPreview && (
+          <div className="mx-[18px] mt-4 bg-pitch-green-light/60 border border-pitch-green-light rounded-lg px-4 py-3 flex items-start gap-3">
+            <span className="font-sans text-[11px] uppercase tracking-[0.08em] text-pitch-green font-medium whitespace-nowrap mt-0.5">June 11</span>
+            <p className="font-sans text-[12px] text-pitch-ink-mid leading-[1.5]">
+              This is a preview of the live experience. Scores, standings, and recaps will update automatically once the tournament kicks off on June 11.{' '}
+              <a href="/" className="text-pitch-green hover:text-pitch-green-mid underline">← Back to home</a>
+            </p>
+          </div>
+        )}
+
         {/* Catch me up */}
         <div className="px-[18px] pt-4 pb-2">
           <Link
@@ -448,7 +490,7 @@ function TournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeData>
         {data.players.length > 0 && (
           <>
             <div className="border-t-2 border-pitch-rule mt-4" />
-            <SectionFlag label="Players to know" linkText="More" linkHref="/groups" />
+            <SectionFlag label="Players to know" linkText="All players" linkHref="/players" />
             {(data.players as Player[]).map((p) => (
               <PlayerCard key={p.id} player={p} showTeam />
             ))}
@@ -524,25 +566,7 @@ function FaqSection() {
       <div id="faq" />
       <div className="border-t-2 border-pitch-rule mt-6" />
       <SectionFlag label="World Cup FAQ" />
-      <div className="border-b border-pitch-rule">
-        {GENERAL_FAQ.map((item) => (
-          <details key={item.label} className="group border-t border-pitch-rule first:border-t-0">
-            <summary className="list-none cursor-pointer px-[18px] py-4">
-              <div className="flex items-start justify-between gap-4">
-                <p className="font-sans text-[13px] font-medium text-pitch-ink leading-[1.5]">
-                  {item.label}
-                </p>
-                <span className="font-sans text-[18px] leading-none text-pitch-green transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </div>
-            </summary>
-            <div className="px-[18px] pb-4">
-              <p className="font-sans text-[13px] text-pitch-ink-mid leading-[1.6]">{item.body}</p>
-            </div>
-          </details>
-        ))}
-      </div>
+      <FaqAccordion items={GENERAL_FAQ} />
     </>
   );
 }

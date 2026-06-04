@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useAskBarOffset } from '@/hooks/useAskBarOffset';
 
 interface AskBarProps {
   placeholder?: string;
   context?: string;
 }
 
-const MAX_QUESTIONS = 5;
+const MAX_QUESTIONS = 10;
 const SESSION_KEY = 'pitch_ask_count';
 
 const SUGGESTIONS = [
@@ -64,6 +65,18 @@ export default function AskBar({
   const [open, setOpen] = useState(false);
   const [remaining, setRemaining] = useState(MAX_QUESTIONS);
   const inputRef = useRef<HTMLInputElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const footerOffset = useAskBarOffset();
+  const [barHeight, setBarHeight] = useState(160);
+
+  useEffect(() => {
+    if (!barRef.current) return;
+    const obs = new ResizeObserver(() => {
+      setBarHeight(barRef.current?.offsetHeight ?? 160);
+    });
+    obs.observe(barRef.current);
+    return () => obs.disconnect();
+  }, []);
 
   useEffect(() => {
     const stored = parseInt(sessionStorage.getItem(SESSION_KEY) ?? '0', 10);
@@ -123,7 +136,8 @@ export default function AskBar({
       {open && (answer || loading) && (
         <div className="fixed inset-0 z-40 flex items-end" onClick={() => setOpen(false)}>
           <div
-            className="w-full max-w-[640px] mx-auto mb-[80px] px-[18px]"
+            className="w-full max-w-[640px] mx-auto px-[18px]"
+            style={{ marginBottom: `${barHeight + footerOffset + 8}px` }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="bg-pitch-white border border-pitch-rule rounded-xl p-5 shadow-lg">
@@ -153,11 +167,15 @@ export default function AskBar({
       )}
 
       {/* Fixed bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-pitch-white border-t-2 border-pitch-ink">
-        <div className="max-w-[640px] mx-auto px-[18px] pt-2 pb-[14px]">
+      <div
+        ref={barRef}
+        className="fixed left-0 right-0 z-50 bg-pitch-cream border-t-2 border-pitch-green"
+        style={{ bottom: `${footerOffset}px` }}
+      >
+        <div className="max-w-[640px] mx-auto p-4">
 
           {/* Label + suggestions row */}
-          {remaining === MAX_QUESTIONS && !open && (
+          {!open && remaining > 0 && (
             <div className="flex items-center gap-2 mb-2 overflow-x-auto pb-0.5">
               <span className="font-sans text-[10px] uppercase tracking-[0.08em] text-pitch-ink-light whitespace-nowrap flex-shrink-0">
                 Ask Pitch
@@ -174,6 +192,11 @@ export default function AskBar({
             </div>
           )}
 
+          {/* Context label */}
+          <p className="font-sans text-[11px] text-pitch-ink-light mb-2">
+            Ask about teams, players, matches, and tournament strategy
+          </p>
+
           {/* Input row */}
           <div className="flex gap-2 items-center">
             <input
@@ -184,7 +207,7 @@ export default function AskBar({
               onKeyDown={handleKeyDown}
               placeholder={remaining > 0 ? placeholder : 'No questions remaining this session'}
               disabled={remaining <= 0}
-              className="flex-1 font-sans text-[13px] bg-pitch-cream border border-pitch-rule rounded-[20px] px-4 py-2.5 text-pitch-ink placeholder-pitch-ink-light focus:outline-none focus:border-pitch-green focus:ring-2 focus:ring-pitch-green/10 disabled:opacity-50"
+              className="flex-1 font-sans text-[13px] bg-pitch-white border border-pitch-rule rounded-[20px] px-4 py-2.5 text-pitch-ink placeholder-pitch-ink-light focus:outline-none focus:border-pitch-green focus:ring-2 focus:ring-pitch-green/10 disabled:opacity-50"
             />
             <button
               onClick={() => handleAsk()}

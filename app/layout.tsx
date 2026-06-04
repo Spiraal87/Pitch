@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
+import Footer from "@/components/Footer";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -18,7 +19,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Pitch — Understand the Game",
-  description: "Sports intelligence for the 2026 FIFA World Cup. Plain English context, team stories, and AI briefings for casual fans.",
+  description: "Sports intelligence for the 2026 FIFA World Cup. Plain English context, team stories, and AI briefings for fans.",
 };
 
 export default function RootLayout({
@@ -28,8 +29,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
-      <body className="font-sans antialiased bg-pitch-cream text-pitch-ink">
-        {children}
+      <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css" />
+      </head>
+      <body className="font-sans antialiased bg-pitch-cream text-pitch-ink flex flex-col min-h-screen">
+        <div className="flex-1">
+          {children}
+        </div>
+        <Footer />
       </body>
     </html>
   );

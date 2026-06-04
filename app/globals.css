@@ -15,6 +15,10 @@
   --pitch-white:        #FFFFFF;
 }
 
+html {
+  scroll-padding-bottom: 200px;
+}
+
 body {
   background-color: var(--pitch-cream);
   color: var(--pitch-ink);

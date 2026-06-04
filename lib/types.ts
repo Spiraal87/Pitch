@@ -19,6 +19,7 @@ export interface Player {
   is_featured: boolean;
   goals: number;
   assists: number;
+  image_url: string | null;
   generated_at: string | null;
   created_at: string;
   team?: Team;

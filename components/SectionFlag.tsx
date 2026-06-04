@@ -9,9 +9,9 @@ interface SectionFlagProps {
 export default function SectionFlag({ label, linkText, linkHref }: SectionFlagProps) {
   return (
     <div className="flex items-center justify-between px-[18px] pt-4 pb-2">
-      <div className="flex items-center gap-2.5">
-        <div className="w-[3px] h-[16px] bg-pitch-green flex-shrink-0" />
-        <span className="font-serif text-[15px] font-medium text-pitch-ink">
+      <div className="flex items-center gap-3">
+        <div className="w-[4px] h-[20px] bg-pitch-green flex-shrink-0" />
+        <span className="font-serif text-[19px] font-medium text-pitch-ink">
           {label}
         </span>
       </div>

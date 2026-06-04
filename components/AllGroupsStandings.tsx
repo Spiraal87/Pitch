@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Standing } from '@/lib/types';
+import Flag from '@/components/Flag';
 
 interface AllGroupsStandingsProps {
   standings: Standing[];
@@ -49,8 +50,9 @@ export default function AllGroupsStandings({ standings }: AllGroupsStandingsProp
                           >
                             <div className="flex items-center gap-1.5 min-w-0">
                               <span className="font-sans text-[10px] text-pitch-ink-light w-3 flex-shrink-0">{i + 1}</span>
-                              <span className="font-sans text-[11px] text-pitch-ink truncate">
-                                {s.team?.name ?? s.team_id}
+                              <span className="font-sans text-[11px] text-pitch-ink truncate flex items-center gap-1.5">
+                                <Flag name={s.team?.name ?? s.team_id} />
+                                <span>{s.team?.name ?? s.team_id}</span>
                               </span>
                             </div>
                             <div className="flex items-center gap-2 flex-shrink-0 ml-1">

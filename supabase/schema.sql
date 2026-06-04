@@ -21,6 +21,7 @@ create table if not exists players (
   is_featured boolean default false,
   goals integer default 0,
   assists integer default 0,
+  image_url text,
   generated_at timestamptz,
   created_at timestamptz default now()
 );

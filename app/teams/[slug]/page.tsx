@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { Team, Player, Match } from '@/lib/types';
-import { teamSlug, getInitials, isTournamentLive } from '@/lib/utils';
+import { teamSlug, isTournamentLive } from '@/lib/utils';
+import Flag from '@/components/Flag';
 import Masthead from '@/components/Masthead';
 import SectionFlag from '@/components/SectionFlag';
 import AskBar from '@/components/AskBar';
@@ -79,10 +80,8 @@ export default async function TeamPage({ params }: { params: { slug: string } })
                 </p>
               )}
             </div>
-            <div className="flex-shrink-0 w-[48px] h-[48px] rounded-full bg-pitch-green-light flex items-center justify-center mt-1">
-              <span className="font-sans text-[14px] font-medium text-pitch-green">
-                {getInitials(team.name)}
-              </span>
+            <div className="flex-shrink-0 w-[48px] h-[36px] flex items-center justify-center mt-1">
+              <Flag name={team.name} size="lg" />
             </div>
           </div>
 
@@ -99,7 +98,10 @@ export default async function TeamPage({ params }: { params: { slug: string } })
             <SectionFlag label={`Group ${team.group_letter} standing`} linkText={`Full group`} linkHref={`/groups/${team.group_letter?.toLowerCase()}`} />
             <div className="mx-[18px] mb-4 bg-pitch-cream border border-pitch-rule rounded-lg px-4 py-3">
               <div className="flex items-center justify-between">
-                <span className="font-sans text-[12px] text-pitch-ink">{team.name}</span>
+                <span className="font-sans text-[12px] text-pitch-ink flex items-center gap-1.5">
+                  <Flag name={team.name} />
+                  <span>{team.name}</span>
+                </span>
                 <div className="flex gap-4">
                   <span className="font-sans text-[12px] text-pitch-ink-light">{standing.played}G</span>
                   <span className="font-sans text-[12px] text-pitch-ink-light">{standing.won}W {standing.drawn}D {standing.lost}L</span>

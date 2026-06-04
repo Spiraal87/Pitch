@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 
     const tournamentContext = await buildTournamentContext();
 
-    const systemPrompt = `You are a helpful sports guide for Pitch, an app that helps casual fans understand the 2026 FIFA World Cup. Speak in plain, casual English. No jargon. Keep answers to 2-4 sentences unless more detail is needed. Never mention scores for upcoming matches. Focus on stories, players, context.
+    const systemPrompt = `You are a helpful sports guide for Pitch, an app that helps fans understand the 2026 FIFA World Cup. Speak in plain, casual English. No jargon. Keep answers to 2-4 sentences unless more detail is needed. Never mention scores for upcoming matches. Focus on stories, players, context.
 
 Current tournament context:
 ${tournamentContext}

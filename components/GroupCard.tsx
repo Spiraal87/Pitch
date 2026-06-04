@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Standing } from '@/lib/types';
+import Flag from '@/components/Flag';
 
 interface GroupCardProps {
   group: string;
@@ -28,8 +29,9 @@ export default function GroupCard({ group, standings, showFavorite = false }: Gr
             >
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="font-sans text-[10px] text-pitch-ink-light w-3 flex-shrink-0">{i + 1}</span>
-                <span className="font-sans text-[12px] text-pitch-ink truncate">
-                  {s.team?.name ?? s.team_id}
+                <span className="font-sans text-[12px] text-pitch-ink truncate flex items-center gap-1.5">
+                  <Flag name={s.team?.name ?? s.team_id} />
+                  <span>{s.team?.name ?? s.team_id}</span>
                 </span>
                 {showFavorite && i === 0 && (
                   <span className="bg-pitch-green text-white font-sans text-[9px] font-medium px-1 py-0.5 rounded leading-none ml-0.5">

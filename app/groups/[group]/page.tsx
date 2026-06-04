@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { Standing, Match } from '@/lib/types';
 import { teamSlug, isTournamentLive } from '@/lib/utils';
+import Flag from '@/components/Flag';
 import Masthead from '@/components/Masthead';
 import SectionFlag from '@/components/SectionFlag';
 import AskBar from '@/components/AskBar';
@@ -90,7 +91,8 @@ export default async function GroupDetailPage({ params }: { params: { group: str
             <div key={s.team_id} className="flex items-center px-4 py-2.5 border-b border-pitch-rule last:border-0">
               <span className="font-sans text-[12px] text-pitch-ink-light w-6">{i + 1}</span>
               <div className="flex-1 flex items-center gap-2 min-w-0">
-                <Link href={`/teams/${teamSlug(s.team?.name ?? s.team_id)}`}>
+                <Link href={`/teams/${teamSlug(s.team?.name ?? s.team_id)}`} className="flex items-center gap-1.5">
+                  <Flag name={s.team?.name ?? s.team_id} />
                   <span className="font-sans text-[12px] text-pitch-ink hover:text-pitch-green">
                     {s.team?.name ?? s.team_id}
                   </span>

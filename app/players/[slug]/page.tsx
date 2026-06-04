@@ -1,6 +1,11 @@
 import { supabase } from '@/lib/supabase';
 import { Player, Team } from '@/lib/types';
-import { playerSlug, teamSlug, getInitials } from '@/lib/utils';
+import { playerSlug, teamSlug } from '@/lib/utils';
+import Flag from '@/components/Flag';
+import Masthead from '@/components/Masthead';
+import AskBar from '@/components/AskBar';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 function cleanBio(text: string): string {
   return text
@@ -9,10 +14,6 @@ function cleanBio(text: string): string {
     .replace(/\*/g, '')
     .trim();
 }
-import Masthead from '@/components/Masthead';
-import AskBar from '@/components/AskBar';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
 
 async function getPlayerBySlug(slug: string) {
   const { data: players } = await supabase
@@ -38,8 +39,8 @@ export default async function PlayerPage({ params }: { params: { slug: string } 
         {/* Back nav */}
         <div className="px-[18px] pt-4 pb-2">
           {team && (
-            <Link href={`/teams/${teamSlug(team.name)}`} className="font-sans text-[12px] text-pitch-green-mid hover:text-pitch-green">
-              ← {team.name}
+            <Link href={`/teams/${teamSlug(team.name)}`} className="font-sans text-[12px] text-pitch-green-mid hover:text-pitch-green flex items-center gap-1.5">
+              ← <Flag name={team.name} /> {team.name}
             </Link>
           )}
         </div>
@@ -47,18 +48,30 @@ export default async function PlayerPage({ params }: { params: { slug: string } 
         {/* Player header */}
         <div className="px-[18px] pb-6">
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-[56px] h-[56px] rounded-full bg-pitch-green-light flex items-center justify-center">
-              <span className="font-sans text-[16px] font-medium text-pitch-green">
-                {getInitials(player.name)}
-              </span>
+            {/* Avatar / photo */}
+            <div className="flex-shrink-0 w-[64px] h-[64px] rounded-full overflow-hidden bg-pitch-green-light flex items-center justify-center">
+              {player.image_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={player.image_url}
+                  alt={player.name}
+                  className="w-full h-full object-cover object-top"
+                />
+              ) : (
+                <span className="font-sans text-[18px] font-medium text-pitch-green">
+                  {player.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                </span>
+              )}
             </div>
+
             <div>
               <h1 className="font-serif text-[28px] font-medium text-pitch-ink leading-tight">
                 {player.name}
               </h1>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
                 {team && (
-                  <Link href={`/teams/${teamSlug(team.name)}`}>
+                  <Link href={`/teams/${teamSlug(team.name)}`} className="flex items-center gap-1.5">
+                    <Flag name={team.name} />
                     <span className="font-sans text-[12px] text-pitch-green-mid hover:text-pitch-green">
                       {team.name}
                     </span>
@@ -107,11 +120,7 @@ export default async function PlayerPage({ params }: { params: { slug: string } 
             <Link href={`/teams/${teamSlug(team.name)}`}>
               <div className="flex items-center justify-between px-4 py-3 bg-pitch-cream border border-pitch-rule rounded-lg hover:border-pitch-green-accent transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-[30px] h-[30px] rounded-full bg-pitch-green-light flex items-center justify-center">
-                    <span className="font-sans text-[10px] font-medium text-pitch-green">
-                      {getInitials(team.name)}
-                    </span>
-                  </div>
+                  <Flag name={team.name} size="md" />
                   <div>
                     <p className="font-sans text-[13px] font-medium text-pitch-ink">{team.name}</p>
                     <p className="font-sans text-[11px] text-pitch-ink-light">Group {team.group_letter}</p>
