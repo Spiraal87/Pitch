@@ -29,7 +29,7 @@ export default function AboutPage() {
             </p>
 
             <p>
-              Traditional sports coverage assumes you follow every league and know every player. Pitch doesn't. We provide editorial context, team stories, player profiles, and AI-powered briefings in plain English — so any fan can follow along, no matter how closely they follow the sport.
+              Traditional sports coverage assumes you follow every league and know every player. Pitch doesn&apos;t. We provide editorial context, team stories, player profiles, and AI-powered briefings in plain English — so any fan can follow along, no matter how closely they follow the sport.
             </p>
 
             <div className="border-l-2 border-pitch-green pl-4 py-1">

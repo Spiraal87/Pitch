@@ -17,6 +17,12 @@ function cleanBio(text: string, maxLen: number): string {
 }
 
 export default function PlayerCard({ player, showTeam = false }: PlayerCardProps) {
+  const meta = [
+    showTeam && player.team ? player.team.name : null,
+    player.jersey_number ? `#${player.jersey_number}` : null,
+    player.position,
+  ].filter(Boolean).join(' · ');
+
   return (
     <Link href={`/players/${playerSlug(player.name)}`}>
       <div className="group flex gap-3 px-[18px] py-3 border-b border-pitch-rule hover:bg-[#F0F5EA] hover:border-l-2 hover:border-l-pitch-green cursor-pointer">
@@ -38,9 +44,11 @@ export default function PlayerCard({ player, showTeam = false }: PlayerCardProps
           <p className="font-sans text-[13px] font-medium text-pitch-ink leading-tight group-hover:text-pitch-green">
             {player.name}
           </p>
-          <p className="font-sans text-[11px] text-pitch-ink-light">
-            {showTeam && player.team ? `${player.team.name} · ` : ''}{player.position}
-          </p>
+          {meta && (
+            <p className="font-sans text-[11px] text-pitch-ink-light">
+              {meta}
+            </p>
+          )}
           {player.bio_text && (
             <p className="font-sans text-[13px] italic text-pitch-ink-mid leading-[1.4] mt-1">
               {cleanBio(player.bio_text, 120)}

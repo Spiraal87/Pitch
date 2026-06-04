@@ -34,7 +34,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Ask Bar Questions</h2>
               <p>
-                When you use the Ask feature, your question is sent to Anthropic's Claude API for processing. We do not store your questions or responses. Your questions are subject to Anthropic's{' '}
+                When you use the Ask feature, your question is sent to Anthropic&apos;s Claude API for processing. We do not store your questions or responses. Your questions are subject to Anthropic&apos;s{' '}
                 <a href="https://www.anthropic.com/legal/privacy-policy" className="text-pitch-green hover:text-pitch-green-mid">
                   privacy policy
                 </a>.

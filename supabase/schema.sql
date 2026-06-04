@@ -16,6 +16,7 @@ create table if not exists players (
   name text not null,
   team_id text references teams(id),
   position text,
+  jersey_number integer,
   age integer,
   bio_text text,
   is_featured boolean default false,
@@ -71,3 +72,6 @@ create index if not exists standings_group_idx on standings(group_letter);
 create index if not exists players_team_idx on players(team_id);
 create index if not exists players_featured_idx on players(is_featured);
 create index if not exists teams_featured_idx on teams(is_featured);
+
+-- Existing databases created before jersey numbers were added
+alter table players add column if not exists jersey_number integer;

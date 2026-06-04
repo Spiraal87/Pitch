@@ -246,9 +246,14 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
       <main className="max-w-[640px] mx-auto pb-52">
         {/* Hero */}
         <div className="px-[18px] py-6 text-center">
-          <p className="font-sans text-[13px] text-pitch-ink-mid leading-[1.5] mb-6">
-            48 teams. 3 host nations. One trophy. Here&apos;s everything you need to understand what&apos;s happening.
-          </p>
+          <div className="mb-6">
+            <p className="font-serif text-[25px] font-semibold leading-[1.12] text-pitch-ink">
+              48 teams. 3 host nations. One trophy.
+            </p>
+            <p className="mt-2 font-sans text-[14px] font-semibold leading-[1.45] text-pitch-green-mid">
+              Here&apos;s everything you need to understand what&apos;s happening.
+            </p>
+          </div>
           <Link
             href="/briefing"
             className="block w-full max-w-[calc(100%-36px)] mx-auto bg-pitch-green text-white font-sans text-[13px] font-medium py-3 rounded-lg hover:bg-pitch-green-mid hover:shadow-md hover:-translate-y-0.5 transition-all text-center"

@@ -75,5 +75,5 @@ export function getIsoCodeByName(name: string): string | null {
 }
 
 // Legacy emoji helpers — kept for any callers that still use them
-export function getFlag(teamId: string): string { return ''; }
-export function getFlagByName(name: string): string { return ''; }
+export function getFlag(): string { return ''; }
+export function getFlagByName(): string { return ''; }

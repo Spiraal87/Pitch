@@ -14,6 +14,7 @@ export interface Player {
   name: string;
   team_id: string;
   position: string | null;
+  jersey_number: number | null;
   age: number | null;
   bio_text: string | null;
   is_featured: boolean;

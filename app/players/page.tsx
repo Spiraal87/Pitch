@@ -30,7 +30,7 @@ export default async function PlayersPage() {
             Players to Know
           </h1>
           <p className="font-sans text-[13px] text-pitch-ink-mid mt-1">
-            The players who'll define the 2026 World Cup.
+            The players who&apos;ll define the 2026 World Cup.
           </p>
         </div>
 

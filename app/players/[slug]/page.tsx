@@ -83,6 +83,12 @@ export default async function PlayerPage({ params }: { params: { slug: string } 
                     <span className="font-sans text-[12px] text-pitch-ink-light">{player.position}</span>
                   </>
                 )}
+                {player.jersey_number && (
+                  <>
+                    <span className="text-pitch-rule">·</span>
+                    <span className="font-sans text-[12px] text-pitch-ink-light">#{player.jersey_number}</span>
+                  </>
+                )}
                 {player.age && (
                   <>
                     <span className="text-pitch-rule">·</span>

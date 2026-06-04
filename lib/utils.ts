@@ -1,4 +1,4 @@
-export const TOURNAMENT_START = new Date('2026-06-11T00:00:00-04:00');
+export const TOURNAMENT_START = new Date('2026-06-11T13:00:00-06:00');
 
 export function isTournamentLive(): boolean {
   return new Date() >= TOURNAMENT_START;

@@ -39,7 +39,7 @@ export default function TermsPage() {
               <ul className="list-disc list-inside space-y-1 ml-2">
                 <li>Reproduce, modify, or distribute content without permission</li>
                 <li>Use automated tools or bots to scrape or extract data</li>
-                <li>Interfere with or disrupt the app's operation</li>
+                <li>Interfere with or disrupt the app&apos;s operation</li>
                 <li>Reverse-engineer or attempt to bypass any feature</li>
               </ul>
             </div>
@@ -47,7 +47,7 @@ export default function TermsPage() {
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Disclaimer of Warranties</h2>
               <p>
-                Pitch is provided "as is" without warranties of any kind, either express or implied. We do not guarantee the accuracy, completeness, or reliability of the content or AI-generated responses.
+                Pitch is provided &quot;as is&quot; without warranties of any kind, either express or implied. We do not guarantee the accuracy, completeness, or reliability of the content or AI-generated responses.
               </p>
             </div>
 
