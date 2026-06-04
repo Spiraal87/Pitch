@@ -38,67 +38,25 @@ The home page automatically switches from pre-tournament to live dashboard on Ju
 
 ## Getting started
 
-### 1. Clone and install
-
 ```bash
 git clone https://github.com/Spiraal87/Pitch.git
 cd Pitch
 npm install
+cp .env.local.example .env.local  # fill in all values
 ```
 
-### 2. Environment variables
-
-Copy `.env.local.example` to `.env.local` and fill in all values:
+Run `supabase/schema.sql` in the Supabase SQL editor, then seed:
 
 ```bash
-cp .env.local.example .env.local
-```
-
-| Variable | Where to find it |
-|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API → Project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API → anon public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role key |
-| `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) |
-| `FOOTBALL_DATA_API_KEY` | [football-data.org](https://www.football-data.org) (free tier) |
-| `CRON_SECRET` | Any random string — protects `/api/sync` |
-| `NEXT_PUBLIC_APP_URL` | Your Vercel URL (leave blank for local dev) |
-
-### 3. Set up Supabase
-
-Run `supabase/schema.sql` in the Supabase SQL editor. Then disable Row Level Security (this is a public read-only app):
-
-```sql
-ALTER TABLE teams DISABLE ROW LEVEL SECURITY;
-ALTER TABLE players DISABLE ROW LEVEL SECURITY;
-ALTER TABLE matches DISABLE ROW LEVEL SECURITY;
-ALTER TABLE standings DISABLE ROW LEVEL SECURITY;
-ALTER TABLE briefings DISABLE ROW LEVEL SECURITY;
-```
-
-### 4. Seed the database
-
-```bash
-# Full seed: teams, players, fixtures, AI-generated bios (~3 mins)
-npm run seed
-
-# Skip AI generation (faster, good for testing)
-npm run seed:skip-ai
-
-# Generate bios for all 48 teams + 40 additional standout players
-npm run expand
-
-# Re-fetch fixtures only (useful if the fetch errored during seed)
-npm run fixtures
-```
-
-### 5. Run locally
-
-```bash
+npm run seed        # teams, players, fixtures, AI bios
+npm run expand      # bios for all 48 teams + 40 more players
+npm run fixtures    # re-fetch fixtures only
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000). Add `?live=1` to preview the live tournament dashboard before June 11.
+Visit [http://localhost:3000](http://localhost:3000). Add `?live=1` to preview the live dashboard before June 11.
+
+Deploy to Vercel — add env vars and the `vercel.json` cron handles daily score syncing automatically.
 
 ---
 
@@ -141,15 +99,6 @@ scripts/
   expand-content.ts      # Extended team + player bios
   fetch-fixtures.ts      # Standalone fixture fetch/resync
 ```
-
----
-
-## Deployment
-
-1. Push to GitHub
-2. Import the repo at [vercel.com](https://vercel.com)
-3. Add all environment variables from `.env.local`
-4. Deploy — the `vercel.json` cron runs `/api/sync` daily at 6am ET to fetch scores, update standings, generate context lines, and write the daily briefing
 
 ---
 
