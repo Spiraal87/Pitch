@@ -22,7 +22,8 @@ export default async function SchedulePage() {
     <>
       <Masthead />
       <main className="max-w-[640px] mx-auto pb-32">
-        <SectionFlag label="Schedule" />
+        <SectionFlag label="Full Match Schedule" />
+        <p className="px-[18px] pb-2 font-sans text-[13px] text-pitch-ink-mid">All 104 matches · times shown in your local timezone</p>
         <ScheduleClient matches={matches} />
       </main>
       <AskBar placeholder="Ask about the schedule..." />

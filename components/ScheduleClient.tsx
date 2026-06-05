@@ -51,6 +51,7 @@ export default function ScheduleClient({ matches, initialGroup }: ScheduleClient
     <>
       {/* Group filter */}
       <div className="px-[18px] pb-3 overflow-x-auto">
+        <p className="font-sans text-[10px] uppercase tracking-[0.08em] text-pitch-ink-light mb-2">Filter by group</p>
         <div className="flex gap-1.5 w-max">
           <button
             onClick={() => setActiveGroup('')}
@@ -85,7 +86,7 @@ export default function ScheduleClient({ matches, initialGroup }: ScheduleClient
           value={teamSearch}
           onChange={(e) => setTeamSearch(e.target.value)}
           placeholder="Search by team name..."
-          className="w-full font-sans text-[12px] bg-pitch-white border border-pitch-rule rounded-lg px-4 py-2.5 text-pitch-ink placeholder-pitch-ink-light focus:outline-none focus:border-pitch-green-mid"
+          className="w-full font-sans text-[16px] bg-pitch-white border border-pitch-rule rounded-lg px-4 py-2.5 text-pitch-ink placeholder-pitch-ink-light focus:outline-none focus:border-pitch-green-mid"
         />
       </div>
 
