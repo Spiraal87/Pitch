@@ -16,7 +16,9 @@ export default function PageNav({ items }: PageNavProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const ids = items.map((item) => item.href.replace('#', ''));
+    const ids = items
+      .filter((item) => item.href.startsWith('#'))
+      .map((item) => item.href.replace('#', ''));
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -51,6 +53,7 @@ export default function PageNav({ items }: PageNavProps) {
   }, [activeHref]);
 
   function handleClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (!href.startsWith('#')) return; // let browser navigate normally
     e.preventDefault();
     const id = href.replace('#', '');
     const el = document.getElementById(id);
