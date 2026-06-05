@@ -195,9 +195,23 @@ const GENERAL_FAQ = [
 async function getHomeData(forceLive = false) {
   const live = isTournamentLive() || forceLive;
 
-  // Use mock data for preview when forceLive is true
+  // Preview mode: use real DB data but mark as live so TournamentHome renders
   if (forceLive && !isTournamentLive()) {
-    return getMockTournamentData();
+    const [standingsRes, upcomingRes, playersRes] = await Promise.all([
+      supabase.from('standings').select('*, team:teams(*)').order('group_letter').order('points', { ascending: false }),
+      supabase.from('matches').select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)').gte('date', new Date().toISOString()).order('date').limit(12),
+      supabase.from('players').select('*, team:teams(*)').eq('is_featured', true).limit(10),
+    ]);
+    return {
+      live: true,
+      teams: [],
+      standings: standingsRes.data ?? [],
+      todayMatches: [],
+      yesterdayMatches: [],
+      upcomingMatches: upcomingRes.data ?? [],
+      topPlayers: [],
+      players: playersRes.data ?? [],
+    };
   }
 
   if (!live) {

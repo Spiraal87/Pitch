@@ -91,10 +91,49 @@ export async function GET(req: NextRequest) {
       await supabase.from('standings').upsert(Object.values(table), { onConflict: 'team_id' });
     }
 
+    // Fetch top scorers from football-data.org
+    const scorersRes = await fetch(
+      'https://api.football-data.org/v4/competitions/WC/scorers?season=2026&limit=20',
+      { headers: { 'X-Auth-Token': apiKey } }
+    );
+
+    let scorersUpdated = 0;
+    if (scorersRes.ok) {
+      const scorersData = await scorersRes.json();
+      const scorers = scorersData.scorers ?? [];
+
+      for (const entry of scorers) {
+        const player = entry.player;
+        const team = entry.team;
+        if (!player?.name) continue;
+
+        const playerId = teamId(player.name);
+        const playerTeamId = teamId(team?.name ?? '');
+        const goals = entry.goals ?? 0;
+        const assists = entry.assists ?? 0;
+
+        // Upsert — creates minimal record if player not in DB, updates stats if they are
+        await supabase.from('players').upsert({
+          id: playerId,
+          name: player.name,
+          team_id: playerTeamId || null,
+          position: player.position ?? null,
+          goals,
+          assists,
+          is_featured: false,
+          image_url: null,
+          bio_text: null,
+        }, { onConflict: 'id', ignoreDuplicates: false });
+
+        scorersUpdated++;
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       matchesUpdated: matchRows.length,
       standingsUpdated: Object.keys(table).length,
+      scorersUpdated,
     });
   } catch (err) {
     return NextResponse.json({ error: String(err) }, { status: 500 });

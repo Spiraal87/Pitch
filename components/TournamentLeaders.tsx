@@ -8,6 +8,7 @@ interface TopPlayer {
   position: string | null;
   goals: number;
   assists: number;
+  is_featured?: boolean;
   team: { name: string; group_letter: string } | null;
 }
 
@@ -65,7 +66,7 @@ export default function TournamentLeaders({ topPlayers, completedMatches }: Tour
       name: p.name,
       team: p.team?.name ?? '',
       count: p.goals,
-      href: `/players/${playerSlug(p.name)}`,
+      href: p.is_featured ? `/players/${playerSlug(p.name)}` : `/teams/${teamSlug(p.team?.name ?? '')}`,
     }));
 
   // Top assists
@@ -78,7 +79,7 @@ export default function TournamentLeaders({ topPlayers, completedMatches }: Tour
       name: p.name,
       team: p.team?.name ?? '',
       count: p.assists,
-      href: `/players/${playerSlug(p.name)}`,
+      href: p.is_featured ? `/players/${playerSlug(p.name)}` : `/teams/${teamSlug(p.team?.name ?? '')}`,
     }));
 
   // Clean sheets — computed from completed match data

@@ -69,7 +69,7 @@ export default function TeamFinder({ teams }: TeamFinderProps) {
             if (error) setError('');
           }}
           placeholder="Search for a team"
-          className="flex-1 font-sans text-[12px] bg-pitch-cream border border-pitch-rule rounded-[20px] px-4 py-2 text-pitch-ink placeholder-pitch-ink-light focus:outline-none focus:border-pitch-green-mid"
+          className="flex-1 font-sans text-[16px] bg-pitch-cream border border-pitch-rule rounded-[20px] px-4 py-2 text-pitch-ink placeholder-pitch-ink-light focus:outline-none focus:border-pitch-green-mid"
         />
         <button
           type="submit"
