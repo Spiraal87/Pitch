@@ -1,0 +1,17 @@
+name: Sync Standings
+
+on:
+  schedule:
+    # Every 30 minutes during tournament (June 11 – July 19 2026)
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # allow manual trigger from GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync scores and standings
+        run: |
+          curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.APP_URL }}/api/sync-standings"
