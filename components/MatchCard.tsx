@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { Match } from '@/lib/types';
-import { formatMatchDate, teamSlug } from '@/lib/utils';
+import { teamSlug } from '@/lib/utils';
 import { getMatchVenue } from '@/lib/venues';
 import Flag from '@/components/Flag';
+import LocalKickoff from '@/components/LocalKickoff';
 
 interface MatchCardProps {
   match: Match;
@@ -11,7 +12,6 @@ interface MatchCardProps {
 
 export default function MatchCard({ match, compact = false }: MatchCardProps) {
   const isResult = match.home_score !== null && match.away_score !== null;
-  const dateLabel = formatMatchDate(match.date);
   const groupLabel = match.group_letter ? `GROUP ${match.group_letter}` : match.stage?.toUpperCase() ?? '';
   const venue = getMatchVenue(match.home_team_id, match.away_team_id);
   const locationLabel = venue ? `${venue.city}` : null;
@@ -21,7 +21,9 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
   if (compact && isResult) {
     return (
       <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream cursor-pointer">
-        <p className="font-sans text-[10px] uppercase tracking-wider text-pitch-ink-light mb-1">{dateLabel}</p>
+        <p className="font-sans text-[10px] uppercase tracking-wider text-pitch-ink-light mb-1">
+          <LocalKickoff date={match.date} />
+        </p>
         <div className="flex items-center justify-between">
           <Link href={`/teams/${teamSlug(homeName)}`} className="font-sans text-[13px] font-medium text-pitch-ink hover:text-pitch-green flex items-center gap-1.5">
             <Flag name={homeName} />
@@ -46,7 +48,7 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
     <div className="bg-pitch-white border border-pitch-rule rounded-lg overflow-hidden mx-[18px] my-3 shadow-sm card-hover">
       <div className="px-4 py-4">
         <p className="font-sans text-[10px] uppercase tracking-wider text-pitch-ink-light mb-2">
-          {groupLabel} · {dateLabel}{locationLabel ? ` · ${locationLabel}` : ''}
+          {groupLabel} · <LocalKickoff date={match.date} />{locationLabel ? ` · ${locationLabel}` : ''}
         </p>
         <div className="flex items-center justify-between">
           <div className="flex-1">
