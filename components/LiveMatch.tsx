@@ -39,7 +39,7 @@ export default function LiveMatch({
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
             <p className="font-sans text-[11px] uppercase font-bold tracking-widest text-red-600">
-              Live · {minute}'
+              Live · {minute}&apos;
             </p>
           </div>
           <p className="font-sans text-[10px] text-pitch-ink-light uppercase tracking-wide">

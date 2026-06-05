@@ -40,8 +40,8 @@ function getMockTournamentData() {
       stage: 'group',
       context_line: null,
       recap_line: 'Vinicius Jr double leads Brazil past Japan',
-      home_team: { id: 'brazil', name: 'Brazil' } as any,
-      away_team: { id: 'japan', name: 'Japan' } as any,
+      home_team: { id: 'brazil', name: 'Brazil' } as unknown as Team,
+      away_team: { id: 'japan', name: 'Japan' } as unknown as Team,
       created_at: new Date().toISOString(),
     },
     // Today's matches
@@ -57,8 +57,8 @@ function getMockTournamentData() {
       stage: 'group',
       context_line: 'Spain eye top spot in Group A',
       recap_line: 'Yamal and Rodri seal victory for Spain',
-      home_team: { id: 'spain', name: 'Spain' } as any,
-      away_team: { id: 'germany', name: 'Germany' } as any,
+      home_team: { id: 'spain', name: 'Spain' } as unknown as Team,
+      away_team: { id: 'germany', name: 'Germany' } as unknown as Team,
       created_at: new Date().toISOString(),
     },
     // Upcoming matches
@@ -74,24 +74,24 @@ function getMockTournamentData() {
       stage: 'group',
       context_line: 'Titans clash in Group B',
       recap_line: null,
-      home_team: { id: 'argentina', name: 'Argentina' } as any,
-      away_team: { id: 'france', name: 'France' } as any,
+      home_team: { id: 'argentina', name: 'Argentina' } as unknown as Team,
+      away_team: { id: 'france', name: 'France' } as unknown as Team,
       created_at: new Date().toISOString(),
     },
   ];
 
   const mockStandings: Standing[] = [
-    { team_id: 'spain', group_letter: 'A', played: 4, won: 3, drawn: 1, lost: 0, goals_for: 9, goals_against: 2, points: 10, status_label: '', team: { id: 'spain', name: 'Spain' } as any, updated_at: new Date().toISOString() },
-    { team_id: 'germany', group_letter: 'A', played: 4, won: 2, drawn: 1, lost: 1, goals_for: 7, goals_against: 4, points: 7, status_label: '', team: { id: 'germany', name: 'Germany' } as any, updated_at: new Date().toISOString() },
-    { team_id: 'japan', group_letter: 'A', played: 4, won: 1, drawn: 1, lost: 2, goals_for: 5, goals_against: 8, points: 4, status_label: '', team: { id: 'japan', name: 'Japan' } as any, updated_at: new Date().toISOString() },
-    { team_id: 'argentina', group_letter: 'B', played: 4, won: 4, drawn: 0, lost: 0, goals_for: 12, goals_against: 3, points: 12, status_label: '', team: { id: 'argentina', name: 'Argentina' } as any, updated_at: new Date().toISOString() },
-    { team_id: 'france', group_letter: 'B', played: 4, won: 2, drawn: 1, lost: 1, goals_for: 8, goals_against: 5, points: 7, status_label: '', team: { id: 'france', name: 'France' } as any, updated_at: new Date().toISOString() },
+    { team_id: 'spain', group_letter: 'A', played: 4, won: 3, drawn: 1, lost: 0, goals_for: 9, goals_against: 2, points: 10, status_label: '', team: { id: 'spain', name: 'Spain' } as unknown as Team, updated_at: new Date().toISOString() },
+    { team_id: 'germany', group_letter: 'A', played: 4, won: 2, drawn: 1, lost: 1, goals_for: 7, goals_against: 4, points: 7, status_label: '', team: { id: 'germany', name: 'Germany' } as unknown as Team, updated_at: new Date().toISOString() },
+    { team_id: 'japan', group_letter: 'A', played: 4, won: 1, drawn: 1, lost: 2, goals_for: 5, goals_against: 8, points: 4, status_label: '', team: { id: 'japan', name: 'Japan' } as unknown as Team, updated_at: new Date().toISOString() },
+    { team_id: 'argentina', group_letter: 'B', played: 4, won: 4, drawn: 0, lost: 0, goals_for: 12, goals_against: 3, points: 12, status_label: '', team: { id: 'argentina', name: 'Argentina' } as unknown as Team, updated_at: new Date().toISOString() },
+    { team_id: 'france', group_letter: 'B', played: 4, won: 2, drawn: 1, lost: 1, goals_for: 8, goals_against: 5, points: 7, status_label: '', team: { id: 'france', name: 'France' } as unknown as Team, updated_at: new Date().toISOString() },
   ];
 
   const mockPlayers: Player[] = [
-    { id: 'messi', name: 'Lionel Messi', team_id: 'argentina', position: 'Forward', jersey_number: 10, age: 39, bio_text: 'The GOAT continues his legacy', goals: 3, assists: 2, image_url: null, is_featured: true, generated_at: '', created_at: '', team: { id: 'argentina', name: 'Argentina' } as any },
-    { id: 'vinicius-jr', name: 'Vinicius Jr', team_id: 'brazil', position: 'Winger', jersey_number: 7, age: 24, bio_text: 'Electric pace and precision', goals: 4, assists: 1, image_url: null, is_featured: true, generated_at: '', created_at: '', team: { id: 'brazil', name: 'Brazil' } as any },
-    { id: 'rodri', name: 'Rodri', team_id: 'spain', position: 'Midfielder', jersey_number: 8, age: 25, bio_text: 'Dictates the tempo', goals: 2, assists: 3, image_url: null, is_featured: true, generated_at: '', created_at: '', team: { id: 'spain', name: 'Spain' } as any },
+    { id: 'messi', name: 'Lionel Messi', team_id: 'argentina', position: 'Forward', jersey_number: 10, age: 39, bio_text: 'The GOAT continues his legacy', goals: 3, assists: 2, image_url: null, is_featured: true, generated_at: '', created_at: '', team: { id: 'argentina', name: 'Argentina' } as unknown as Team },
+    { id: 'vinicius-jr', name: 'Vinicius Jr', team_id: 'brazil', position: 'Winger', jersey_number: 7, age: 24, bio_text: 'Electric pace and precision', goals: 4, assists: 1, image_url: null, is_featured: true, generated_at: '', created_at: '', team: { id: 'brazil', name: 'Brazil' } as unknown as Team },
+    { id: 'rodri', name: 'Rodri', team_id: 'spain', position: 'Midfielder', jersey_number: 8, age: 25, bio_text: 'Dictates the tempo', goals: 2, assists: 3, image_url: null, is_featured: true, generated_at: '', created_at: '', team: { id: 'spain', name: 'Spain' } as unknown as Team },
   ];
 
   return {
