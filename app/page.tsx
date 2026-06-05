@@ -18,6 +18,94 @@ import Link from 'next/link';
 
 const FEATURED_TEAM_ORDER = ['Spain', 'Argentina', 'France', 'Brazil', 'England', 'Norway'];
 
+function getMockTournamentData() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const mockMatches: Match[] = [
+    // Yesterday's results
+    {
+      id: 'match-1',
+      date: new Date(yesterday.getTime() + 18 * 60 * 60 * 1000).toISOString(),
+      home_team_id: 'brazil',
+      away_team_id: 'japan',
+      home_score: 4,
+      away_score: 1,
+      group_letter: 'C',
+      matchday: 4,
+      stage: 'group',
+      context_line: null,
+      recap_line: 'Vinicius Jr double leads Brazil past Japan',
+      home_team: { id: 'brazil', name: 'Brazil' } as any,
+      away_team: { id: 'japan', name: 'Japan' } as any,
+      created_at: new Date().toISOString(),
+    },
+    // Today's matches
+    {
+      id: 'match-2',
+      date: new Date(today.getTime() + 14 * 60 * 60 * 1000).toISOString(),
+      home_team_id: 'spain',
+      away_team_id: 'germany',
+      home_score: 2,
+      away_score: 1,
+      group_letter: 'A',
+      matchday: 5,
+      stage: 'group',
+      context_line: 'Spain eye top spot in Group A',
+      recap_line: 'Yamal and Rodri seal victory for Spain',
+      home_team: { id: 'spain', name: 'Spain' } as any,
+      away_team: { id: 'germany', name: 'Germany' } as any,
+      created_at: new Date().toISOString(),
+    },
+    // Upcoming matches
+    {
+      id: 'match-3',
+      date: new Date(tomorrow.getTime() + 18 * 60 * 60 * 1000).toISOString(),
+      home_team_id: 'argentina',
+      away_team_id: 'france',
+      home_score: null,
+      away_score: null,
+      group_letter: 'B',
+      matchday: 5,
+      stage: 'group',
+      context_line: 'Titans clash in Group B',
+      recap_line: null,
+      home_team: { id: 'argentina', name: 'Argentina' } as any,
+      away_team: { id: 'france', name: 'France' } as any,
+      created_at: new Date().toISOString(),
+    },
+  ];
+
+  const mockStandings: Standing[] = [
+    { team_id: 'spain', group_letter: 'A', played: 4, won: 3, drawn: 1, lost: 0, goals_for: 9, goals_against: 2, points: 10, status_label: '', team: { id: 'spain', name: 'Spain' } as any, updated_at: new Date().toISOString() },
+    { team_id: 'germany', group_letter: 'A', played: 4, won: 2, drawn: 1, lost: 1, goals_for: 7, goals_against: 4, points: 7, status_label: '', team: { id: 'germany', name: 'Germany' } as any, updated_at: new Date().toISOString() },
+    { team_id: 'japan', group_letter: 'A', played: 4, won: 1, drawn: 1, lost: 2, goals_for: 5, goals_against: 8, points: 4, status_label: '', team: { id: 'japan', name: 'Japan' } as any, updated_at: new Date().toISOString() },
+    { team_id: 'argentina', group_letter: 'B', played: 4, won: 4, drawn: 0, lost: 0, goals_for: 12, goals_against: 3, points: 12, status_label: '', team: { id: 'argentina', name: 'Argentina' } as any, updated_at: new Date().toISOString() },
+    { team_id: 'france', group_letter: 'B', played: 4, won: 2, drawn: 1, lost: 1, goals_for: 8, goals_against: 5, points: 7, status_label: '', team: { id: 'france', name: 'France' } as any, updated_at: new Date().toISOString() },
+  ];
+
+  const mockPlayers: Player[] = [
+    { id: 'messi', name: 'Lionel Messi', team_id: 'argentina', position: 'Forward', jersey_number: 10, age: 39, bio_text: 'The GOAT continues his legacy', goals: 3, assists: 2, image_url: null, is_featured: true, generated_at: '', created_at: '', team: { id: 'argentina', name: 'Argentina' } as any },
+    { id: 'vinicius-jr', name: 'Vinicius Jr', team_id: 'brazil', position: 'Winger', jersey_number: 7, age: 24, bio_text: 'Electric pace and precision', goals: 4, assists: 1, image_url: null, is_featured: true, generated_at: '', created_at: '', team: { id: 'brazil', name: 'Brazil' } as any },
+    { id: 'rodri', name: 'Rodri', team_id: 'spain', position: 'Midfielder', jersey_number: 8, age: 25, bio_text: 'Dictates the tempo', goals: 2, assists: 3, image_url: null, is_featured: true, generated_at: '', created_at: '', team: { id: 'spain', name: 'Spain' } as any },
+  ];
+
+  return {
+    live: true,
+    teams: [],
+    standings: mockStandings,
+    todayMatches: mockMatches.filter(m => new Date(m.date).toDateString() === today.toDateString()),
+    yesterdayMatches: mockMatches.filter(m => new Date(m.date).toDateString() === yesterday.toDateString()),
+    upcomingMatches: mockMatches.filter(m => new Date(m.date).toDateString() === tomorrow.toDateString()),
+    players: mockPlayers,
+    topPlayers: mockPlayers,
+  };
+}
+
 const TEAM_NARRATIVES: Record<string, { label: string; body: string }> = {
   Spain: {
     label: 'Favorites',
@@ -107,6 +195,11 @@ const GENERAL_FAQ = [
 async function getHomeData(forceLive = false) {
   const live = isTournamentLive() || forceLive;
 
+  // Use mock data for preview when forceLive is true
+  if (forceLive && !isTournamentLive()) {
+    return getMockTournamentData();
+  }
+
   if (!live) {
     const [teamsRes, standingsRes, playersRes] = await Promise.all([
       supabase
@@ -176,13 +269,13 @@ async function getHomeData(forceLive = false) {
       .order('points', { ascending: false }),
     supabase
       .from('players')
-      .select('id, name, position, goals, assists, team:teams(name, group_letter)')
+      .select('id, name, position, image_url, goals, assists, team:teams(name, group_letter)')
       .or('goals.gt.0,assists.gt.0')
       .order('goals', { ascending: false })
       .limit(20),
     supabase
       .from('players')
-      .select('*, team:teams(*)')
+      .select('id, name, position, image_url, age, bio_text, team:teams(*)')
       .eq('is_featured', true)
       .limit(10),
   ]);
@@ -265,7 +358,6 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
 
         <div className="border-t border-pitch-rule" />
 
-        {/* Live June 11 teaser */}
         <div className="mx-[18px] mb-4 bg-pitch-green-light/50 border border-pitch-green-light rounded-lg p-4">
           <p className="font-sans text-[11px] uppercase tracking-[0.10em] text-pitch-green font-medium mb-1">
             Live from June 11, 2026
