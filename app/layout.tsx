@@ -53,7 +53,6 @@ export const metadata: Metadata = {
     images: ["https://pitch.world/pitch-logo.svg"],
     creator: "@pitch",
   },
-  canonical: "https://pitch.world",
   alternates: {
     canonical: "https://pitch.world",
   },
