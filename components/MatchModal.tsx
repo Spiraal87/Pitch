@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Match, Standing } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 import Flag from '@/components/Flag';
@@ -37,6 +38,7 @@ async function fetchMatchDetail(homeId: string, awayId: string): Promise<MatchDe
   };
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) {
   const [detail, setDetail] = useState<MatchDetail | null>(null);
 
@@ -196,10 +198,12 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
                     {players.map((p: any) => (
                       <div key={p.id} className="flex items-center gap-2 p-2 bg-pitch-cream rounded">
                         {p.image_url && (
-                          <img
+                          <Image
                             src={p.image_url}
                             alt={p.name}
-                            className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+                            width={24}
+                            height={24}
+                            className="rounded-full object-cover flex-shrink-0"
                           />
                         )}
                         <div className="min-w-0 flex-1">
