@@ -32,6 +32,7 @@ async function fetchMatchDetail(homeId: string, awayId: string): Promise<MatchDe
   ]);
   return {
     standings: (standingsRes.data ?? []) as Standing[],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     players: (playersRes.data ?? []) as any[],
   };
 }
@@ -185,11 +186,13 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
                 Players to Watch
               </p>
               <div className="grid grid-cols-2 gap-3">
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {[
                   detail.players.filter((p: any) => p.team?.name === homeName).slice(0, 2),
                   detail.players.filter((p: any) => p.team?.name === awayName).slice(0, 2),
                 ].map((players, i) => (
                   <div key={i} className="space-y-2">
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {players.map((p: any) => (
                       <div key={p.id} className="flex items-center gap-2 p-2 bg-pitch-cream rounded">
                         {p.image_url && (
