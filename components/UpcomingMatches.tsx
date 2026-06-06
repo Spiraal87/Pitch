@@ -12,7 +12,8 @@ export default function UpcomingMatches({ matches }: UpcomingMatchesProps) {
 
   // Group by date, show max 2 days
   const byDate = matches.reduce<Record<string, Match[]>>((acc, m) => {
-    const day = new Date(m.date).toISOString().split('T')[0];
+    const d = new Date(m.date);
+    const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     if (!acc[day]) acc[day] = [];
     acc[day].push(m);
     return acc;

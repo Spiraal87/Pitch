@@ -12,9 +12,13 @@ interface ScheduleClientProps {
 
 const ALL_GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
 
+function localDateKey(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 function groupByDate(matches: Match[]): Record<string, Match[]> {
   return matches.reduce<Record<string, Match[]>>((acc, m) => {
-    const day = new Date(m.date).toISOString().split('T')[0];
+    const day = localDateKey(new Date(m.date));
     if (!acc[day]) acc[day] = [];
     acc[day].push(m);
     return acc;
@@ -22,7 +26,7 @@ function groupByDate(matches: Match[]): Record<string, Match[]> {
 }
 
 function isToday(dateStr: string): boolean {
-  return dateStr === new Date().toISOString().split('T')[0];
+  return dateStr === localDateKey(new Date());
 }
 
 export default function ScheduleClient({ matches, initialGroup }: ScheduleClientProps) {
@@ -45,7 +49,7 @@ export default function ScheduleClient({ matches, initialGroup }: ScheduleClient
 
   const byDate = groupByDate(filtered);
   const dates = Object.keys(byDate).sort();
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = localDateKey(new Date());
 
   return (
     <>
