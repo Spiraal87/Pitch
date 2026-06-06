@@ -262,6 +262,7 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
           { label: 'FAQ', href: '#faq' },
           { label: 'Groups', href: '#groups' },
           { label: 'Schedule', href: '/schedule' },
+          { label: 'Knockout', href: '/knockout' },
         ]} />
       </div>
       <main className="max-w-[640px] mx-auto pb-52">
@@ -431,6 +432,7 @@ function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof g
           { label: 'Underdogs', href: '#underdogs' },
           { label: 'Teams', href: '#teams' },
           { label: 'Schedule', href: '/schedule' },
+          { label: 'Knockout', href: '/knockout' },
           { label: 'FAQs', href: '#how' },
         ]} />
       </div>

@@ -38,7 +38,8 @@ export default function ScheduleClient({ matches, initialGroup }: ScheduleClient
       const homeName = m.home_team?.name ?? '';
       const awayName = m.away_team?.name ?? '';
 
-      const groupMatch = !activeGroup || m.group_letter === activeGroup;
+      const groupMatch = !activeGroup
+        || (activeGroup === 'KO' ? m.group_letter === null : m.group_letter === activeGroup);
       const searchMatch = !teamSearch.trim() ||
         homeName.toLowerCase().includes(teamSearch.toLowerCase()) ||
         awayName.toLowerCase().includes(teamSearch.toLowerCase());
@@ -80,6 +81,16 @@ export default function ScheduleClient({ matches, initialGroup }: ScheduleClient
               {g}
             </button>
           ))}
+          <button
+            onClick={() => setActiveGroup(activeGroup === 'KO' ? '' : 'KO')}
+            className={`font-sans text-[11px] px-3 py-1 rounded-full border transition-colors ${
+              activeGroup === 'KO'
+                ? 'border-pitch-green bg-pitch-green text-white'
+                : 'border-pitch-rule text-pitch-ink-light hover:border-pitch-green-mid'
+            }`}
+          >
+            Knockout
+          </button>
         </div>
       </div>
 
