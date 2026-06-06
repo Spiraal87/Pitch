@@ -1,0 +1,15 @@
+# Allow all search engines to crawl and index
+User-agent: *
+Allow: /
+
+# Disallow admin and private paths
+Disallow: /admin
+Disallow: /api/
+Disallow: /.next/
+Disallow: /briefing
+
+# Sitemaps
+Sitemap: https://pitch.world/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1

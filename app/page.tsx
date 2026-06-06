@@ -277,9 +277,12 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
           </div>
           <Link
             href="/briefing"
-            className="block w-full max-w-[calc(100%-36px)] mx-auto bg-pitch-green text-white font-sans text-[13px] font-medium py-3 rounded-lg hover:bg-pitch-green-mid hover:shadow-md hover:-translate-y-0.5 transition-all text-center"
+            className="group block w-full max-w-[calc(100%-36px)] mx-auto bg-pitch-green text-white font-sans text-[13px] font-medium py-3 rounded-lg hover:bg-pitch-green-mid hover:shadow-md hover:-translate-y-0.5 transition-all text-center active:scale-95"
           >
-            Get me up to speed
+            Get me up to speed{' '}
+            <span className="inline-block opacity-0 translate-x-[-4px] group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+              →
+            </span>
           </Link>
           <TeamFinder teams={allTeams} />
         </div>
@@ -305,7 +308,7 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
 
         {/* Teams to watch */}
         <div id="teams" />
-        <SectionFlag label="Teams to watch" linkText="All groups" linkHref="/groups" />
+        <SectionFlag label="Teams to watch" linkText="All teams" linkHref="/teams" />
         <div>
           {FEATURED_TEAM_ORDER.map((name) => {
             const narrative = TEAM_NARRATIVES[name];
@@ -554,7 +557,7 @@ function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof g
         {/* Teams to watch */}
         <div id="teams" />
         <div className="border-t-2 border-pitch-rule mt-6" />
-        <SectionFlag label="Teams to watch" linkText="All groups" linkHref="/groups" />
+        <SectionFlag label="Teams to watch" linkText="All teams" linkHref="/teams" />
         <div>
           {FEATURED_TEAM_ORDER.map((name) => {
             const narrative = TEAM_NARRATIVES[name];

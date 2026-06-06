@@ -117,6 +117,20 @@ export default function AskBar({
     if (e.key === 'Escape') setOpen(false);
   }
 
+  function handleInputFocus() {
+    // Force reflow when keyboard opens to ensure Ask Bar positions correctly
+    setTimeout(() => {
+      window.scrollTo(0, window.scrollY);
+    }, 100);
+  }
+
+  function handleInputBlur() {
+    // Force reflow when keyboard closes
+    setTimeout(() => {
+      window.scrollTo(0, window.scrollY);
+    }, 100);
+  }
+
   return (
     <>
       {/* Answer overlay */}
@@ -154,7 +168,7 @@ export default function AskBar({
       )}
 
       {/* Fixed bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-pitch-cream border-t-2 border-pitch-green">
+      <div className="fixed left-0 right-0 z-50 bg-pitch-cream border-t-2 border-pitch-green will-change-transform" style={{ bottom: 0 }}>
         <div className="max-w-[640px] mx-auto px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
 
           {/* Label + suggestions row */}
@@ -188,6 +202,8 @@ export default function AskBar({
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={handleKeyDown}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
               placeholder={remaining > 0 ? placeholder : 'No questions remaining this session'}
               disabled={remaining <= 0}
               className="flex-1 font-sans text-[16px] bg-pitch-white border border-pitch-rule rounded-[20px] px-4 py-2.5 text-pitch-ink placeholder-pitch-ink-light focus:outline-none focus:border-pitch-green focus:ring-2 focus:ring-pitch-green/10 disabled:opacity-50"
