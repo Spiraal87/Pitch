@@ -17,8 +17,8 @@ export default function Masthead() {
           <Link href="/" className="hover:opacity-75 transition-opacity">
             <Image
               src="/pitch-logo.svg"
-              alt="Pitch"
-              width={160}
+              alt="PitchNotes"
+              width={200}
               height={60}
               priority
             />

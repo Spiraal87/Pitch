@@ -79,19 +79,17 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
           <div className="text-center">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="flex-1">
-                <Link href={`/teams/${teamSlug(homeName)}`}>
-                  <div className="hover:opacity-75 transition-opacity">
-                    <Flag name={homeName} size="lg" />
-                    <p className="font-sans text-[16px] font-medium text-pitch-ink mt-2">
-                      {homeName}
+                <div>
+                  <Flag name={homeName} size="lg" />
+                  <p className="font-sans text-[16px] font-medium text-pitch-ink mt-2">
+                    {homeName}
+                  </p>
+                  {match.home_team?.fifa_rank && (
+                    <p className="font-sans text-[11px] text-pitch-ink-light mt-1">
+                      FIFA #{match.home_team.fifa_rank}
                     </p>
-                    {match.home_team?.fifa_rank && (
-                      <p className="font-sans text-[11px] text-pitch-ink-light mt-1">
-                        FIFA #{match.home_team.fifa_rank}
-                      </p>
-                    )}
-                  </div>
-                </Link>
+                  )}
+                </div>
               </div>
 
               <div className="text-center">
@@ -105,19 +103,17 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
               </div>
 
               <div className="flex-1">
-                <Link href={`/teams/${teamSlug(awayName)}`}>
-                  <div className="hover:opacity-75 transition-opacity">
-                    <Flag name={awayName} size="lg" />
-                    <p className="font-sans text-[16px] font-medium text-pitch-ink mt-2">
-                      {awayName}
+                <div>
+                  <Flag name={awayName} size="lg" />
+                  <p className="font-sans text-[16px] font-medium text-pitch-ink mt-2">
+                    {awayName}
+                  </p>
+                  {match.away_team?.fifa_rank && (
+                    <p className="font-sans text-[11px] text-pitch-ink-light mt-1">
+                      FIFA #{match.away_team.fifa_rank}
                     </p>
-                    {match.away_team?.fifa_rank && (
-                      <p className="font-sans text-[11px] text-pitch-ink-light mt-1">
-                        FIFA #{match.away_team.fifa_rank}
-                      </p>
-                    )}
-                  </div>
-                </Link>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -197,15 +193,18 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {players.map((p: any) => (
                       <div key={p.id} className="flex items-center gap-2 p-2 bg-pitch-cream rounded">
-                        {p.image_url && (
-                          <Image
-                            src={p.image_url}
-                            alt={p.name}
-                            width={24}
-                            height={24}
-                            className="rounded-full object-cover flex-shrink-0"
-                          />
-                        )}
+                        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-pitch-cream">
+                          {p.image_url && (
+                            <Image
+                              src={p.image_url}
+                              alt={p.name}
+                              width={32}
+                              height={32}
+                              className="w-8 h-8 object-cover object-top"
+                              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                            />
+                          )}
+                        </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-sans text-[11px] font-medium text-pitch-ink truncate">
                             {p.name}

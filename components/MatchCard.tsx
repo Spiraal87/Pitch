@@ -1,9 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Match } from '@/lib/types';
-import { teamSlug } from '@/lib/utils';
 import { getMatchVenue } from '@/lib/venues';
 import Flag from '@/components/Flag';
 import LocalKickoff from '@/components/LocalKickoff';
@@ -25,27 +23,30 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
 
   if (compact && isResult) {
     return (
-      <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream cursor-pointer">
-        <p className="font-sans text-[10px] uppercase tracking-wider text-pitch-ink-light mb-1">
-          <LocalKickoff date={match.date} />
-        </p>
-        <div className="flex items-center justify-between">
-          <Link href={`/teams/${teamSlug(homeName)}`} className="font-sans text-[13px] font-medium text-pitch-ink hover:text-pitch-green flex items-center gap-1.5">
-            <Flag name={homeName} />
-            <span>{homeName}</span>
-          </Link>
-          <span className="font-serif text-[16px] font-medium text-pitch-ink px-3">
-            {match.home_score} – {match.away_score}
-          </span>
-          <Link href={`/teams/${teamSlug(awayName)}`} className="font-sans text-[13px] font-medium text-pitch-ink hover:text-pitch-green flex items-center justify-end gap-1.5">
-            <span>{awayName}</span>
-            <Flag name={awayName} />
-          </Link>
+      <>
+        <div onClick={() => setIsModalOpen(true)} className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream cursor-pointer">
+          <p className="font-sans text-[10px] uppercase tracking-wider text-pitch-ink-light mb-1">
+            <LocalKickoff date={match.date} />
+          </p>
+          <div className="flex items-center justify-between">
+            <div className="font-sans text-[13px] font-medium text-pitch-ink flex items-center gap-1.5">
+              <Flag name={homeName} />
+              <span>{homeName}</span>
+            </div>
+            <span className="font-serif text-[16px] font-medium text-pitch-ink px-3">
+              {match.home_score} – {match.away_score}
+            </span>
+            <div className="font-sans text-[13px] font-medium text-pitch-ink flex items-center justify-end gap-1.5">
+              <span>{awayName}</span>
+              <Flag name={awayName} />
+            </div>
+          </div>
+          {match.recap_line && (
+            <p className="font-sans text-[12px] italic text-pitch-ink-mid mt-1">{match.recap_line}</p>
+          )}
         </div>
-        {match.recap_line && (
-          <p className="font-sans text-[12px] italic text-pitch-ink-mid mt-1">{match.recap_line}</p>
-        )}
-      </div>
+        <MatchModal match={match} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      </>
     );
   }
 
@@ -59,12 +60,10 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
             </p>
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <Link href={`/teams/${teamSlug(homeName)}`} onClick={(e) => e.stopPropagation()}>
-                  <p className="font-sans text-[14px] font-medium text-pitch-ink hover:text-pitch-green flex items-center gap-1.5">
-                    <Flag name={homeName} />
-                    <span>{homeName}</span>
-                  </p>
-                </Link>
+                <p className="font-sans text-[14px] font-medium text-pitch-ink flex items-center gap-1.5">
+                  <Flag name={homeName} />
+                  <span>{homeName}</span>
+                </p>
               </div>
               <div className="px-4 text-center">
                 {isResult ? (
@@ -76,12 +75,10 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
                 )}
               </div>
               <div className="flex-1 text-right">
-                <Link href={`/teams/${teamSlug(awayName)}`} onClick={(e) => e.stopPropagation()}>
-                  <p className="font-sans text-[14px] font-medium text-pitch-ink hover:text-pitch-green flex items-center justify-end gap-1.5">
-                    <span>{awayName}</span>
-                    <Flag name={awayName} />
-                  </p>
-                </Link>
+                <p className="font-sans text-[14px] font-medium text-pitch-ink flex items-center justify-end gap-1.5">
+                  <span>{awayName}</span>
+                  <Flag name={awayName} />
+                </p>
               </div>
             </div>
           </div>
