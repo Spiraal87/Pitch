@@ -18,22 +18,22 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Pitch — Understand the Game",
+  title: "PitchGuide — Understand the Game",
   description: "Sports intelligence for the 2026 FIFA World Cup. Plain English context, team stories, and AI briefings for fans.",
   keywords: ["World Cup 2026", "FIFA", "soccer", "football", "sports", "tournament", "teams", "players", "briefings"],
   authors: [{ name: "Christopher Johnson" }],
   creator: "Christopher Johnson",
-  publisher: "Pitch",
+  publisher: "PitchGuide",
   robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
   icons: {
     icon: "/favicon.ico",
     apple: "/favicon.ico",
   },
   openGraph: {
-    title: "Pitch — Understand the Game",
+    title: "PitchGuide — Understand the Game",
     description: "Sports intelligence for the 2026 FIFA World Cup. Plain English context, team stories, and AI briefings for fans.",
     url: "https://pitch.world",
-    siteName: "Pitch",
+    siteName: "PitchGuide",
     images: [
       {
         url: "https://pitch.world/pitch-logo.svg",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pitch — Understand the Game",
+    title: "PitchGuide — Understand the Game",
     description: "Sports intelligence for the 2026 FIFA World Cup",
     images: ["https://pitch.world/pitch-logo.svg"],
     creator: "@pitch",
@@ -56,11 +56,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://pitch.world",
   },
-  applicationName: "Pitch",
+  applicationName: "PitchGuide",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Pitch",
+    title: "PitchGuide",
   },
   formatDetection: {
     telephone: false,
@@ -88,7 +88,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'WebApplication',
-              name: 'Pitch',
+              name: 'PitchGuide',
               description: 'Sports intelligence for the 2026 FIFA World Cup',
               url: 'https://pitch.world',
               applicationCategory: 'SportsApplication',
