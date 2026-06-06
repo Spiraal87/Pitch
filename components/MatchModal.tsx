@@ -16,6 +16,7 @@ interface MatchModalProps {
 
 interface MatchDetail {
   standings: Standing[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   players: any[];
 }
 
