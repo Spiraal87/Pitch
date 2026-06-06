@@ -7,7 +7,7 @@ import SectionFlag from '@/components/SectionFlag';
 import AskBar from '@/components/AskBar';
 import MatchCard from '@/components/MatchCard';
 import PlayerCard from '@/components/PlayerCard';
-import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 import { notFound } from 'next/navigation';
 
 async function getTeamBySlug(slug: string) {
@@ -59,9 +59,7 @@ export default async function TeamPage({ params }: { params: { slug: string } })
       <main className="max-w-[640px] mx-auto pb-32">
         {/* Back nav */}
         <div className="px-[18px] pt-4 pb-2">
-          <Link href="/groups" className="font-sans text-[12px] text-pitch-green-mid hover:text-pitch-green">
-            ← Groups
-          </Link>
+          <BackButton />
         </div>
 
         {/* Team header */}
@@ -80,8 +78,10 @@ export default async function TeamPage({ params }: { params: { slug: string } })
                 </p>
               )}
             </div>
-            <div className="flex-shrink-0 w-[48px] h-[36px] flex items-center justify-center mt-1">
-              <Flag name={team.name} size="lg" />
+            <div className="flex-shrink-0 w-[80px] h-[60px] flex items-center justify-center mt-1 bg-pitch-cream rounded-lg">
+              <span style={{ transform: 'scale(2)', transformOrigin: 'center' }}>
+                <Flag name={team.name} size="lg" />
+              </span>
             </div>
           </div>
 
