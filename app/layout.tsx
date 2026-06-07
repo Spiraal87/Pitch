@@ -36,11 +36,11 @@ export const metadata: Metadata = {
     siteName: "PitchGuide",
     images: [
       {
-        url: "https://pitchguide.vercel.app/pitch-logo.svg",
-        width: 200,
-        height: 60,
-        alt: "Pitch Logo",
-        type: "image/svg+xml",
+        url: "https://pitchguide.vercel.app/pitchguide-og.png",
+        width: 1200,
+        height: 630,
+        alt: "PitchGuide - Understand the Game",
+        type: "image/png",
       },
     ],
     type: "website",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PitchGuide - Understand the Game",
     description: "Sports intelligence for the 2026 FIFA World Cup",
-    images: ["https://pitchguide.vercel.app/pitch-logo.svg"],
+    images: ["https://pitchguide.vercel.app/pitchguide-og.png"],
     creator: "@pitch",
   },
   alternates: {
