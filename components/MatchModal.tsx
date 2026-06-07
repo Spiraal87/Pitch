@@ -78,19 +78,17 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
           {/* Score Section with FIFA Ranks */}
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-3">
-              <div className="flex-1">
-                <div>
-                  <Flag name={homeName} size="lg" />
-                  <p className="font-sans text-[16px] font-medium text-pitch-ink mt-2">
-                    {homeName}
+              <Link href={`/teams/${teamSlug(homeName)}`} className="flex-1 hover:opacity-70 transition-opacity">
+                <Flag name={homeName} size="lg" />
+                <p className="font-sans text-[16px] font-medium text-pitch-ink mt-2">
+                  {homeName}
+                </p>
+                {match.home_team?.fifa_rank && (
+                  <p className="font-sans text-[11px] text-pitch-ink-light mt-1">
+                    FIFA #{match.home_team.fifa_rank}
                   </p>
-                  {match.home_team?.fifa_rank && (
-                    <p className="font-sans text-[11px] text-pitch-ink-light mt-1">
-                      FIFA #{match.home_team.fifa_rank}
-                    </p>
-                  )}
-                </div>
-              </div>
+                )}
+              </Link>
 
               <div className="text-center">
                 {isResult ? (
@@ -102,19 +100,17 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
                 )}
               </div>
 
-              <div className="flex-1">
-                <div>
-                  <Flag name={awayName} size="lg" />
-                  <p className="font-sans text-[16px] font-medium text-pitch-ink mt-2">
-                    {awayName}
+              <Link href={`/teams/${teamSlug(awayName)}`} className="flex-1 hover:opacity-70 transition-opacity">
+                <Flag name={awayName} size="lg" />
+                <p className="font-sans text-[16px] font-medium text-pitch-ink mt-2">
+                  {awayName}
+                </p>
+                {match.away_team?.fifa_rank && (
+                  <p className="font-sans text-[11px] text-pitch-ink-light mt-1">
+                    FIFA #{match.away_team.fifa_rank}
                   </p>
-                  {match.away_team?.fifa_rank && (
-                    <p className="font-sans text-[11px] text-pitch-ink-light mt-1">
-                      FIFA #{match.away_team.fifa_rank}
-                    </p>
-                  )}
-                </div>
-              </div>
+                )}
+              </Link>
             </div>
           </div>
 
