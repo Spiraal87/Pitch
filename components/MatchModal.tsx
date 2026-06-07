@@ -59,8 +59,8 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
   const awayName = match.away_team?.name ?? match.away_team_id;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="bg-pitch-white rounded-xl max-w-[640px] w-full max-h-[85vh] sm:max-h-[90vh] overflow-y-auto shadow-xl">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4 pb-[160px] sm:pb-4">
+      <div className="bg-pitch-white rounded-xl max-w-[640px] w-full max-h-[68vh] sm:max-h-[90vh] overflow-y-auto shadow-xl">
         {/* Header */}
         <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-pitch-rule flex items-center justify-between sticky top-0 bg-pitch-white">
           <p className="font-sans text-[11px] uppercase tracking-widest text-pitch-ink-light">

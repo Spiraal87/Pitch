@@ -135,7 +135,7 @@ export default function AskBar({
     <>
       {/* Answer overlay */}
       {open && (answer || loading) && (
-        <div className="fixed inset-0 z-40 flex items-end" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-[60] flex items-end" onClick={() => setOpen(false)}>
           <div
             className="w-full max-w-[640px] mx-auto px-[18px]"
             style={{ marginBottom: '180px' }}
