@@ -18,7 +18,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "PitchGuide â€” Understand the Game",
+  title: "PitchGuide - Understand the Game",
   description: "Sports intelligence for the 2026 FIFA World Cup. Plain English context, team stories, and AI briefings for fans.",
   keywords: ["World Cup 2026", "FIFA", "soccer", "football", "sports", "tournament", "teams", "players", "briefings"],
   authors: [{ name: "Christopher Johnson" }],
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     apple: "/favicon.ico",
   },
   openGraph: {
-    title: "PitchGuide â€” Understand the Game",
+    title: "PitchGuide - Understand the Game",
     description: "Sports intelligence for the 2026 FIFA World Cup. Plain English context, team stories, and AI briefings for fans.",
     url: "https://pitchguide.vercel.app",
     siteName: "PitchGuide",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "PitchGuide â€” Understand the Game",
+    title: "PitchGuide - Understand the Game",
     description: "Sports intelligence for the 2026 FIFA World Cup",
     images: ["https://pitchguide.vercel.app/pitch-logo.svg"],
     creator: "@pitch",
@@ -119,4 +119,5 @@ export default function RootLayout({
     </html>
   );
 }
+
 
