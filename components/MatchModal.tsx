@@ -60,9 +60,9 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="bg-pitch-white rounded-xl max-w-[640px] w-full max-h-[90vh] overflow-y-auto shadow-xl">
+      <div className="bg-pitch-white rounded-xl max-w-[640px] w-full max-h-[85vh] sm:max-h-[90vh] overflow-y-auto shadow-xl">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-pitch-rule flex items-center justify-between sticky top-0 bg-pitch-white">
+        <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-pitch-rule flex items-center justify-between sticky top-0 bg-pitch-white">
           <p className="font-sans text-[11px] uppercase tracking-widest text-pitch-ink-light">
             {groupLabel} · {dateLabel}
           </p>
@@ -74,10 +74,10 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
           </button>
         </div>
 
-        <div className="px-6 py-6 space-y-6">
+        <div className="px-4 py-4 space-y-4 sm:px-6 sm:py-5 sm:space-y-5">
           {/* Score Section with FIFA Ranks */}
           <div className="text-center">
-            <div className="flex items-center justify-center gap-4 mb-4">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <div className="flex-1">
                 <div>
                   <Flag name={homeName} size="lg" />
@@ -132,10 +132,10 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
 
           {/* Team Bios */}
           {(match.home_team?.bio_text || match.away_team?.bio_text) && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {match.home_team?.bio_text && (
-                <div className="px-3 py-3 bg-pitch-cream rounded-lg">
-                  <p className="font-sans text-[10px] uppercase tracking-widest text-pitch-green font-medium mb-2">
+                <div className="px-3 py-2.5 bg-pitch-cream rounded-lg">
+                  <p className="font-sans text-[10px] uppercase tracking-widest text-pitch-green font-medium mb-1.5">
                     {homeName}
                   </p>
                   <p className="font-sans text-[12px] text-pitch-ink leading-[1.5]">
@@ -144,8 +144,8 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
                 </div>
               )}
               {match.away_team?.bio_text && (
-                <div className="px-3 py-3 bg-pitch-cream rounded-lg">
-                  <p className="font-sans text-[10px] uppercase tracking-widest text-pitch-green font-medium mb-2">
+                <div className="px-3 py-2.5 bg-pitch-cream rounded-lg">
+                  <p className="font-sans text-[10px] uppercase tracking-widest text-pitch-green font-medium mb-1.5">
                     {awayName}
                   </p>
                   <p className="font-sans text-[12px] text-pitch-ink leading-[1.5]">
@@ -222,8 +222,8 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
           ) : null}
 
           {/* Match Details */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-4 py-3 bg-pitch-cream rounded-lg">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between px-3 py-2.5 bg-pitch-cream rounded-lg">
               <span className="font-sans text-[12px] text-pitch-ink-light uppercase tracking-wide">
                 Kickoff
               </span>
@@ -237,7 +237,7 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
             </div>
 
             {locationLabel && (
-              <div className="flex items-center justify-between px-4 py-3 bg-pitch-cream rounded-lg">
+              <div className="flex items-center justify-between px-3 py-2.5 bg-pitch-cream rounded-lg">
                 <span className="font-sans text-[12px] text-pitch-ink-light uppercase tracking-wide">
                   Venue
                 </span>
@@ -249,16 +249,16 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
           </div>
 
           {/* Team Links */}
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <Link
               href={`/teams/${teamSlug(homeName)}`}
-              className="flex-1 px-4 py-3 bg-pitch-green text-white font-sans text-[13px] font-medium rounded-lg hover:bg-pitch-green-mid transition-colors text-center"
+              className="flex-1 px-3 py-2.5 bg-pitch-green text-white font-sans text-[12px] font-medium rounded-lg hover:bg-pitch-green-mid transition-colors text-center"
             >
               View {homeName}
             </Link>
             <Link
               href={`/teams/${teamSlug(awayName)}`}
-              className="flex-1 px-4 py-3 bg-pitch-green text-white font-sans text-[13px] font-medium rounded-lg hover:bg-pitch-green-mid transition-colors text-center"
+              className="flex-1 px-3 py-2.5 bg-pitch-green text-white font-sans text-[12px] font-medium rounded-lg hover:bg-pitch-green-mid transition-colors text-center"
             >
               View {awayName}
             </Link>
