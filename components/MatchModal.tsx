@@ -134,24 +134,24 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
           {(match.home_team?.bio_text || match.away_team?.bio_text) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {match.home_team?.bio_text && (
-                <div className="px-3 py-2.5 bg-pitch-cream rounded-lg">
+                <Link href={`/teams/${teamSlug(homeName)}`} className="px-3 py-2.5 bg-pitch-cream rounded-lg hover:bg-[#E8F0E2] transition-colors block">
                   <p className="font-sans text-[10px] uppercase tracking-widest text-pitch-green font-medium mb-1.5">
-                    {homeName}
+                    {homeName} →
                   </p>
                   <p className="font-sans text-[12px] text-pitch-ink leading-[1.5]">
                     {match.home_team.bio_text.split('.')[0]}.
                   </p>
-                </div>
+                </Link>
               )}
               {match.away_team?.bio_text && (
-                <div className="px-3 py-2.5 bg-pitch-cream rounded-lg">
+                <Link href={`/teams/${teamSlug(awayName)}`} className="px-3 py-2.5 bg-pitch-cream rounded-lg hover:bg-[#E8F0E2] transition-colors block">
                   <p className="font-sans text-[10px] uppercase tracking-widest text-pitch-green font-medium mb-1.5">
-                    {awayName}
+                    {awayName} →
                   </p>
                   <p className="font-sans text-[12px] text-pitch-ink leading-[1.5]">
                     {match.away_team.bio_text.split('.')[0]}.
                   </p>
-                </div>
+                </Link>
               )}
             </div>
           )}
