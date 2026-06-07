@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+﻿import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
@@ -18,7 +18,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "PitchGuide — Understand the Game",
+  title: "PitchGuide â€” Understand the Game",
   description: "Sports intelligence for the 2026 FIFA World Cup. Plain English context, team stories, and AI briefings for fans.",
   keywords: ["World Cup 2026", "FIFA", "soccer", "football", "sports", "tournament", "teams", "players", "briefings"],
   authors: [{ name: "Christopher Johnson" }],
@@ -30,13 +30,13 @@ export const metadata: Metadata = {
     apple: "/favicon.ico",
   },
   openGraph: {
-    title: "PitchGuide — Understand the Game",
+    title: "PitchGuide â€” Understand the Game",
     description: "Sports intelligence for the 2026 FIFA World Cup. Plain English context, team stories, and AI briefings for fans.",
-    url: "https://pitch.world",
+    url: "https://pitchguide.vercel.app",
     siteName: "PitchGuide",
     images: [
       {
-        url: "https://pitch.world/pitch-logo.svg",
+        url: "https://pitchguide.vercel.app/pitch-logo.svg",
         width: 200,
         height: 60,
         alt: "Pitch Logo",
@@ -48,13 +48,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "PitchGuide — Understand the Game",
+    title: "PitchGuide â€” Understand the Game",
     description: "Sports intelligence for the 2026 FIFA World Cup",
-    images: ["https://pitch.world/pitch-logo.svg"],
+    images: ["https://pitchguide.vercel.app/pitch-logo.svg"],
     creator: "@pitch",
   },
   alternates: {
-    canonical: "https://pitch.world",
+    canonical: "https://pitchguide.vercel.app",
   },
   applicationName: "PitchGuide",
   appleWebApp: {
@@ -90,7 +90,7 @@ export default function RootLayout({
               '@type': 'WebApplication',
               name: 'PitchGuide',
               description: 'Sports intelligence for the 2026 FIFA World Cup',
-              url: 'https://pitch.world',
+              url: 'https://pitchguide.vercel.app',
               applicationCategory: 'SportsApplication',
               author: {
                 '@type': 'Person',
@@ -103,7 +103,7 @@ export default function RootLayout({
               },
               inLanguage: 'en-US',
               isAccessibleForFree: true,
-              image: 'https://pitch.world/pitch-logo.svg',
+              image: 'https://pitchguide.vercel.app/pitch-logo.svg',
               datePublished: '2026-01-01',
               dateModified: new Date().toISOString().split('T')[0],
             }),
@@ -119,3 +119,4 @@ export default function RootLayout({
     </html>
   );
 }
+

@@ -1,4 +1,4 @@
-# Allow all search engines to crawl and index
+﻿# Allow all search engines to crawl and index
 User-agent: *
 Allow: /
 
@@ -9,7 +9,8 @@ Disallow: /.next/
 Disallow: /briefing
 
 # Sitemaps
-Sitemap: https://pitch.world/sitemap.xml
+Sitemap: https://pitchguide.vercel.app/sitemap.xml
 
 # Crawl delay
 Crawl-delay: 1
+

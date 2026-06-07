@@ -1,9 +1,9 @@
-import { MetadataRoute } from 'next';
+﻿import { MetadataRoute } from 'next';
 import { supabase } from '@/lib/supabase';
 import { teamSlug } from '@/lib/utils';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://pitch.world';
+  const baseUrl = 'https://pitchguide.vercel.app';
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -111,3 +111,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [...staticPages, ...teamPages];
 }
+
