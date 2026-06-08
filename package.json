@@ -18,6 +18,7 @@
     "dotenv": "^17.4.2",
     "flag-icons": "^7.5.0",
     "next": "14.2.35",
+    "posthog-js": "^1.383.1",
     "react": "^18",
     "react-dom": "^18"
   },

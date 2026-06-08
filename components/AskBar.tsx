@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { usePostHog } from 'posthog-js/react';
 
 interface AskBarProps {
   placeholder?: string;
@@ -64,6 +65,7 @@ export default function AskBar({
   const [open, setOpen] = useState(false);
   const [remaining, setRemaining] = useState(MAX_QUESTIONS);
   const inputRef = useRef<HTMLInputElement>(null);
+  const posthog = usePostHog();
 
   useEffect(() => {
     const stored = parseInt(sessionStorage.getItem(SESSION_KEY) ?? '0', 10);
@@ -78,6 +80,8 @@ export default function AskBar({
     const used = parseInt(sessionStorage.getItem(SESSION_KEY) ?? '0', 10) + 1;
     sessionStorage.setItem(SESSION_KEY, String(used));
     setRemaining(MAX_QUESTIONS - used);
+
+    posthog?.capture('ask_question', { question: text, question_number: used });
 
     setLoading(true);
     setAnswer('');

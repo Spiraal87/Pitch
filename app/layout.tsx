@@ -2,6 +2,7 @@
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
+import PostHogProvider from "@/components/PostHogProvider";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -111,10 +112,12 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased bg-pitch-cream text-pitch-ink flex flex-col min-h-screen">
-        <div className="flex-1">
-          {children}
-        </div>
-        <Footer />
+        <PostHogProvider>
+          <div className="flex-1">
+            {children}
+          </div>
+          <Footer />
+        </PostHogProvider>
       </body>
     </html>
   );
