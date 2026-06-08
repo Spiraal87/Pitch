@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { NextRequest } from 'next/server';
 import { getServiceClient } from '@/lib/supabase';
 import { isTournamentLive } from '@/lib/utils';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -63,19 +64,34 @@ ${briefingRes.data?.text ? `Today's briefing: ${briefingRes.data.text}` : ''}`;
 
 export async function POST(req: NextRequest) {
   try {
+    const ip =
+      req.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+      req.headers.get('x-real-ip') ??
+      'unknown';
+
+    const { allowed } = checkRateLimit(ip);
+    if (!allowed) {
+      return new Response('Rate limit exceeded. Try again later.', { status: 429 });
+    }
+
     const { question, context } = await req.json();
 
     if (!question?.trim()) {
       return new Response('Question is required', { status: 400 });
     }
 
+    if (question.length > 500) {
+      return new Response('Question too long', { status: 400 });
+    }
+
     const tournamentContext = await buildTournamentContext();
+    const safeContext = typeof context === 'string' ? context.slice(0, 200) : '';
 
     const systemPrompt = `You are a helpful sports guide for Pitch, an app that helps fans understand the 2026 FIFA World Cup. Speak in plain, casual English. No jargon. Keep answers to 2-4 sentences unless more detail is needed. Never mention scores for upcoming matches. Focus on stories, players, context.
 
 Current tournament context:
 ${tournamentContext}
-${context ? `\nPage context: ${context}` : ''}`;
+${safeContext ? `\nPage context: ${safeContext}` : ''}`;
 
     const stream = await anthropic.messages.stream({
       model: 'claude-haiku-4-5',
