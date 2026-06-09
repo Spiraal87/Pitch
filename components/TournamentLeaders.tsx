@@ -42,7 +42,7 @@ function LeaderSection({ title, rows, unit, icon }: { title: string; rows: Leade
           <div className="flex items-center gap-3 px-[18px] py-2.5 border-b border-pitch-rule hover:bg-pitch-cream transition-colors cursor-pointer">
             <span className="font-sans text-[11px] text-pitch-ink-light/50 w-4 flex-shrink-0 tabular-nums">{i + 1}</span>
             <div className="flex-shrink-0">
-              <Flag name={row.team} size={20} />
+              <Flag name={row.team} size="md" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-sans text-[13px] font-medium text-pitch-ink leading-tight truncate">{row.name}</p>
