@@ -93,7 +93,7 @@ export function getTop4ThirdPlace(byGroup: Record<string, {
     .sort((a, b) =>
       b.points - a.points || (b.goals_for - b.goals_against) - (a.goals_for - a.goals_against) || b.goals_for - a.goals_for
     )
-    .slice(0, 4);
+    .slice(0, 8);
 
   return new Set(top4.map(s => s.team_id));
 }

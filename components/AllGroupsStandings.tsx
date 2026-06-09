@@ -29,6 +29,7 @@ export default function AllGroupsStandings({ standings }: AllGroupsStandingsProp
             group={g}
             standings={byGroup[g] ?? []}
             showFavorite
+            showStats={false}
             isGroupOfDeath={g === groupOfDeath}
             maybeTeamIds={maybeTeamIds}
           />

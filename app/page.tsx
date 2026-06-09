@@ -53,7 +53,7 @@ const FLAG_CODES: Record<string, string> = {
   Japan: 'jp', Senegal: 'sn', Croatia: 'hr',
 };
 
-const UNDERDOG_ORDER = ['Morocco', 'USA', 'Japan', 'Senegal', 'Croatia'];
+const UNDERDOG_ORDER = ['Morocco', 'USA', 'Japan', 'Senegal', 'Croatia', 'Norway'];
 
 const UNDERDOG_NARRATIVES: Record<string, { label: string; body: string }> = {
   Morocco: {
@@ -75,6 +75,10 @@ const UNDERDOG_NARRATIVES: Record<string, { label: string; body: string }> = {
   Croatia: {
     label: 'Last dance',
     body: "Luka Modrić is 40 years old and still running midfields. Croatia have punched above their weight for a decade on his back. This will almost certainly be his final World Cup, and he has a habit of saving his best for the biggest stages.",
+  },
+  Norway: {
+    label: 'Haaland\'s moment',
+    body: "Erling Haaland is the most lethal striker on the planet and this is his first World Cup. Norway haven't been here since 1998 and they got back almost entirely because of him. One player carrying an entire nation's hopes — pure sporting storyline.",
   },
 };
 
@@ -100,7 +104,15 @@ const GENERAL_FAQ = [
   },
   {
     label: 'How do teams advance?',
-    body: 'Each team plays three group-stage matches. The top two teams in every group, plus the eight best third-place teams, move on to the knockout rounds.',
+    body: 'Each team plays three group-stage matches. The top two teams in every group automatically advance. The eight best third-place finishers (out of 12) also go through, meaning most third-place teams still have a real shot.',
+  },
+  {
+    label: 'How do points work in the group stage?',
+    body: 'A win is worth 3 points, a draw 1 point, and a loss 0 points. If two teams are tied on points, goal difference (goals scored minus goals conceded) is the first tiebreaker, then total goals scored. So running up the score in a comfortable win can actually matter later.',
+  },
+  {
+    label: 'What is the offside rule?',
+    body: "When a player receives a pass, they must have at least one defender between them and the goal at the moment the ball is played — not when they receive it, but when their teammate kicks it. The goalkeeper usually counts as one defender, so in practice you need one outfield player between you and the net. If you're ahead of that last defender when the ball leaves your teammate's foot, the referee flags offside and play stops. VAR has made these calls extremely precise — you'll sometimes see goals ruled out by a shoulder or a knee being a few centimetres too far forward.",
   },
   ...HOW_IT_WORKS.map((item) => ({
     label: item.label === 'The format' ? 'What is the World Cup format?' : item.label,
@@ -120,11 +132,13 @@ async function getHomeData(forceLive = false) {
     const now = new Date();
     const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999);
-    const [standingsRes, todayRes, upcomingRes, playersRes] = await Promise.all([
+    const [standingsRes, todayRes, upcomingRes, playersRes, topPlayersRes, allCompletedRes] = await Promise.all([
       supabase.from('standings').select('*, team:teams(*)').order('group_letter').order('points', { ascending: false }),
       supabase.from('matches').select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)').gte('date', todayStart.toISOString()).lte('date', todayEnd.toISOString()).order('date'),
       supabase.from('matches').select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)').gt('date', todayEnd.toISOString()).order('date').limit(12),
       supabase.from('players').select('*, team:teams(*)').eq('is_featured', true).limit(10),
+      supabase.from('players').select('id, name, position, image_url, goals, assists, team:teams(name, group_letter)').or('goals.gt.0,assists.gt.0').order('goals', { ascending: false }).limit(20),
+      supabase.from('matches').select('home_team_id, away_team_id, home_score, away_score, home_team:teams!matches_home_team_id_fkey(name), away_team:teams!matches_away_team_id_fkey(name)').not('home_score', 'is', null),
     ]);
     return {
       live: true,
@@ -133,8 +147,9 @@ async function getHomeData(forceLive = false) {
       todayMatches: todayRes.data ?? [],
       yesterdayMatches: [],
       upcomingMatches: upcomingRes.data ?? [],
-      topPlayers: [],
+      topPlayers: topPlayersRes.data ?? [],
       players: playersRes.data ?? [],
+      allCompletedMatches: allCompletedRes.data ?? [],
     };
   }
 
@@ -176,7 +191,7 @@ async function getHomeData(forceLive = false) {
   const threeDaysOut = new Date(today);
   threeDaysOut.setDate(today.getDate() + 4);
 
-  const [teamsRes, todayRes, yesterdayRes, upcomingRes, allStandingsRes, topPlayersRes, playersRes] = await Promise.all([
+  const [teamsRes, todayRes, yesterdayRes, upcomingRes, allStandingsRes, topPlayersRes, playersRes, allCompletedRes] = await Promise.all([
     supabase
       .from('teams')
       .select('id, name, group_letter, fifa_rank, bio_text, is_featured, generated_at, created_at')
@@ -216,6 +231,10 @@ async function getHomeData(forceLive = false) {
       .select('id, name, position, image_url, age, bio_text, team:teams(*)')
       .eq('is_featured', true)
       .limit(10),
+    supabase
+      .from('matches')
+      .select('home_team_id, away_team_id, home_score, away_score, home_team:teams!matches_home_team_id_fkey(name), away_team:teams!matches_away_team_id_fkey(name)')
+      .not('home_score', 'is', null),
   ]);
 
   return {
@@ -225,6 +244,7 @@ async function getHomeData(forceLive = false) {
     todayMatches: todayRes.data ?? [],
     yesterdayMatches: yesterdayRes.data ?? [],
     upcomingMatches: upcomingRes.data ?? [],
+    allCompletedMatches: allCompletedRes.data ?? [],
     topPlayers: topPlayersRes.data ?? [],
     players: playersRes.data ?? [],
   };
@@ -438,9 +458,10 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
 }
 
 function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof getHomeData>>; isPreview?: boolean }) {
-  const completedMatches = [...(data.todayMatches as Match[]), ...(data.yesterdayMatches as Match[])].filter(
-    (m) => m.home_score !== null
-  );
+  const completedMatches = ((data as { allCompletedMatches?: Match[] }).allCompletedMatches ?? [
+    ...(data.todayMatches as Match[]),
+    ...(data.yesterdayMatches as Match[]),
+  ]).filter((m) => m.home_score !== null);
   const allTeams = data.teams as Team[];
 
   return (
@@ -473,8 +494,27 @@ function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof g
           </div>
         )}
 
+        {/* Hero */}
+        <div className="px-[18px] pt-6 pb-4 text-center">
+          <div className="h-[140px] overflow-hidden mx-auto w-[180px] mb-3 rounded-full">
+            <Image
+              src="/worldcup-logo.png"
+              alt="FIFA World Cup 2026"
+              width={180}
+              height={210}
+              className="object-contain object-top w-full"
+            />
+          </div>
+          <p className="font-serif text-[22px] font-semibold leading-[1.12] text-pitch-ink">
+            48 teams. 3 host nations. One trophy.
+          </p>
+          <p className="mt-1.5 font-sans text-[13px] font-semibold leading-[1.45] text-pitch-green-mid">
+            Here&apos;s everything you need to understand what&apos;s happening.
+          </p>
+        </div>
+
         {/* Catch me up */}
-        <div className="px-[18px] pt-4 pb-2">
+        <div className="px-[18px] pb-2">
           <Link
             href="/briefing"
             className="block w-full bg-pitch-green text-white font-sans text-[13px] font-medium py-3 rounded-lg hover:bg-pitch-green-mid transition-colors text-center"
