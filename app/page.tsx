@@ -46,6 +46,12 @@ const TEAM_NARRATIVES: Record<string, { label: string; body: string }> = {
   },
 };
 
+const FLAG_CODES: Record<string, string> = {
+  Spain: 'es', Argentina: 'ar', France: 'fr', Brazil: 'br',
+  England: 'gb-eng', Norway: 'no', Morocco: 'ma', USA: 'us',
+  Japan: 'jp', Senegal: 'sn', Croatia: 'hr',
+};
+
 const UNDERDOG_ORDER = ['Morocco', 'USA', 'Japan', 'Senegal', 'Croatia'];
 
 const UNDERDOG_NARRATIVES: Record<string, { label: string; body: string }> = {
@@ -310,32 +316,34 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
         {/* Teams to watch */}
         <div id="teams" />
         <SectionFlag label="Teams to watch" linkText="All teams" linkHref="/teams" />
-        <div>
-          {FEATURED_TEAM_ORDER.map((name) => {
-            const narrative = TEAM_NARRATIVES[name];
-            if (!narrative) return null;
-            return (
-              <Link key={name} href={`/teams/${teamSlug(name)}`}>
-                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-[#F0F5EA] hover:border-l-2 hover:border-l-pitch-green transition-colors cursor-pointer">
-                  <div className="flex items-start gap-2">
-                    <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-0.5">
-                        {narrative.label}
-                      </p>
-                      <p className="font-sans text-[13px] text-pitch-ink leading-[1.5]">
-                        <span className="font-medium">{name}</span> —{' '}
-                        {narrative.body}
-                      </p>
+        <div className="px-[18px] pb-6">
+          <div className="grid grid-cols-2 gap-3">
+            {FEATURED_TEAM_ORDER.map((name) => {
+              const narrative = TEAM_NARRATIVES[name];
+              if (!narrative) return null;
+              return (
+                <Link key={name} href={`/teams/${teamSlug(name)}`}>
+                  <div className="border border-pitch-rule rounded-lg p-4 hover:border-pitch-green hover:bg-[#F0F5EA] transition-colors flex flex-col justify-between min-h-[84px]">
+                    <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-2">
+                      {narrative.label}
+                    </p>
+                    <div className="flex items-center justify-between gap-1">
+                      <div className="flex items-center gap-1.5">
+                        {FLAG_CODES[name] && (
+                          <span className={`fi fi-${FLAG_CODES[name]}`} style={{ fontSize: '14px', lineHeight: 1 }} />
+                        )}
+                        <p className="font-sans text-[14px] font-medium text-pitch-ink leading-tight">{name}</p>
+                      </div>
+                      <span className="text-pitch-green text-[12px] flex-shrink-0">→</span>
                     </div>
                   </div>
-                </div>
-              </Link>
-            );
-          })}
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="border-t-2 border-pitch-rule mt-6" />
+        <div className="border-t-2 border-pitch-rule mt-2" />
 
         {/* Players to know */}
         <div id="players" />
@@ -354,31 +362,34 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
         {/* Underdogs to watch */}
         <div id="underdogs" />
         <SectionFlag label="Underdogs to watch" />
-        <div>
-          {UNDERDOG_ORDER.map((name) => {
-            const narrative = UNDERDOG_NARRATIVES[name];
-            if (!narrative) return null;
-            return (
-              <Link key={name} href={`/teams/${teamSlug(name)}`}>
-                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-[#F0F5EA] hover:border-l-2 hover:border-l-pitch-green transition-colors cursor-pointer">
-                  <div className="flex items-start gap-2">
-                    <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-0.5">
-                        {narrative.label}
-                      </p>
-                      <p className="font-sans text-[13px] text-pitch-ink leading-[1.5]">
-                        <span className="font-medium">{name}</span> — {narrative.body}
-                      </p>
+        <div className="px-[18px] pb-6">
+          <div className="grid grid-cols-2 gap-3">
+            {UNDERDOG_ORDER.map((name) => {
+              const narrative = UNDERDOG_NARRATIVES[name];
+              if (!narrative) return null;
+              return (
+                <Link key={name} href={`/teams/${teamSlug(name)}`}>
+                  <div className="border border-pitch-rule rounded-lg p-4 hover:border-pitch-green hover:bg-[#F0F5EA] transition-colors flex flex-col justify-between min-h-[84px]">
+                    <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-2">
+                      {narrative.label}
+                    </p>
+                    <div className="flex items-center justify-between gap-1">
+                      <div className="flex items-center gap-1.5">
+                        {FLAG_CODES[name] && (
+                          <span className={`fi fi-${FLAG_CODES[name]}`} style={{ fontSize: '14px', lineHeight: 1 }} />
+                        )}
+                        <p className="font-sans text-[14px] font-medium text-pitch-ink leading-tight">{name}</p>
+                      </div>
+                      <span className="text-pitch-green text-[12px] flex-shrink-0">→</span>
                     </div>
                   </div>
-                </div>
-              </Link>
-            );
-          })}
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="border-t-2 border-pitch-rule mt-6" />
+        <div className="border-t-2 border-pitch-rule mt-2" />
 
         {/* Groups at a glance */}
         <div id="groups" />
@@ -532,56 +543,62 @@ function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof g
         <div id="underdogs" />
         <div className="border-t-2 border-pitch-rule mt-6" />
         <SectionFlag label="Underdogs to watch" />
-        <div>
-          {UNDERDOG_ORDER.map((name) => {
-            const narrative = UNDERDOG_NARRATIVES[name];
-            if (!narrative) return null;
-            return (
-              <Link key={name} href={`/teams/${teamSlug(name)}`}>
-                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-[#F0F5EA] hover:border-l-2 hover:border-l-pitch-green transition-colors cursor-pointer">
-                  <div className="flex items-start gap-2">
-                    <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-0.5">
-                        {narrative.label}
-                      </p>
-                      <p className="font-sans text-[13px] text-pitch-ink leading-[1.5]">
-                        <span className="font-medium">{name}</span> — {narrative.body}
-                      </p>
+        <div className="px-[18px] pb-6">
+          <div className="grid grid-cols-2 gap-3">
+            {UNDERDOG_ORDER.map((name) => {
+              const narrative = UNDERDOG_NARRATIVES[name];
+              if (!narrative) return null;
+              return (
+                <Link key={name} href={`/teams/${teamSlug(name)}`}>
+                  <div className="border border-pitch-rule rounded-lg p-4 hover:border-pitch-green hover:bg-[#F0F5EA] transition-colors flex flex-col justify-between min-h-[84px]">
+                    <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-2">
+                      {narrative.label}
+                    </p>
+                    <div className="flex items-center justify-between gap-1">
+                      <div className="flex items-center gap-1.5">
+                        {FLAG_CODES[name] && (
+                          <span className={`fi fi-${FLAG_CODES[name]}`} style={{ fontSize: '14px', lineHeight: 1 }} />
+                        )}
+                        <p className="font-sans text-[14px] font-medium text-pitch-ink leading-tight">{name}</p>
+                      </div>
+                      <span className="text-pitch-green text-[12px] flex-shrink-0">→</span>
                     </div>
                   </div>
-                </div>
-              </Link>
-            );
-          })}
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
         {/* Teams to watch */}
         <div id="teams" />
-        <div className="border-t-2 border-pitch-rule mt-6" />
+        <div className="border-t-2 border-pitch-rule mt-2" />
         <SectionFlag label="Teams to watch" linkText="All teams" linkHref="/teams" />
-        <div>
-          {FEATURED_TEAM_ORDER.map((name) => {
-            const narrative = TEAM_NARRATIVES[name];
-            if (!narrative) return null;
-            return (
-              <Link key={name} href={`/teams/${teamSlug(name)}`}>
-                <div className="px-[18px] py-3 border-b border-pitch-rule hover:bg-[#F0F5EA] hover:border-l-2 hover:border-l-pitch-green transition-colors cursor-pointer">
-                  <div className="flex items-start gap-2">
-                    <div className="w-[3px] h-[14px] bg-pitch-green flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-0.5">
-                        {narrative.label}
-                      </p>
-                      <p className="font-sans text-[13px] text-pitch-ink leading-[1.5]">
-                        <span className="font-medium">{name}</span> — {narrative.body}
-                      </p>
+        <div className="px-[18px] pb-6">
+          <div className="grid grid-cols-2 gap-3">
+            {FEATURED_TEAM_ORDER.map((name) => {
+              const narrative = TEAM_NARRATIVES[name];
+              if (!narrative) return null;
+              return (
+                <Link key={name} href={`/teams/${teamSlug(name)}`}>
+                  <div className="border border-pitch-rule rounded-lg p-4 hover:border-pitch-green hover:bg-[#F0F5EA] transition-colors flex flex-col justify-between min-h-[84px]">
+                    <p className="font-sans text-[10px] uppercase font-medium tracking-[0.06em] text-pitch-green-mid mb-2">
+                      {narrative.label}
+                    </p>
+                    <div className="flex items-center justify-between gap-1">
+                      <div className="flex items-center gap-1.5">
+                        {FLAG_CODES[name] && (
+                          <span className={`fi fi-${FLAG_CODES[name]}`} style={{ fontSize: '14px', lineHeight: 1 }} />
+                        )}
+                        <p className="font-sans text-[14px] font-medium text-pitch-ink leading-tight">{name}</p>
+                      </div>
+                      <span className="text-pitch-green text-[12px] flex-shrink-0">→</span>
                     </div>
                   </div>
-                </div>
-              </Link>
-            );
-          })}
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
         <FaqSection />
