@@ -117,16 +117,20 @@ async function getHomeData(forceLive = false) {
 
   // Preview mode: use real DB data but mark as live so TournamentHome renders
   if (forceLive && !isTournamentLive()) {
-    const [standingsRes, upcomingRes, playersRes] = await Promise.all([
+    const now = new Date();
+    const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999);
+    const [standingsRes, todayRes, upcomingRes, playersRes] = await Promise.all([
       supabase.from('standings').select('*, team:teams(*)').order('group_letter').order('points', { ascending: false }),
-      supabase.from('matches').select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)').gte('date', new Date().toISOString()).order('date').limit(12),
+      supabase.from('matches').select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)').gte('date', todayStart.toISOString()).lte('date', todayEnd.toISOString()).order('date'),
+      supabase.from('matches').select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)').gt('date', todayEnd.toISOString()).order('date').limit(12),
       supabase.from('players').select('*, team:teams(*)').eq('is_featured', true).limit(10),
     ]);
     return {
       live: true,
       teams: [],
       standings: standingsRes.data ?? [],
-      todayMatches: [],
+      todayMatches: todayRes.data ?? [],
       yesterdayMatches: [],
       upcomingMatches: upcomingRes.data ?? [],
       topPlayers: [],
@@ -517,7 +521,7 @@ function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof g
         {/* All group standings */}
         <div id="standings" />
         <div className="border-t-2 border-pitch-rule mt-4" />
-        <SectionFlag label="Group standings" linkText="All groups" linkHref="/groups" />
+        <SectionFlag label="Group standings" />
         {data.standings.length > 0 ? (
           <AllGroupsStandings standings={data.standings as Standing[]} />
         ) : (

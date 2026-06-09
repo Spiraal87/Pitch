@@ -73,6 +73,47 @@ export function formatDate(dateStr: string): string {
   });
 }
 
+export function getTop4ThirdPlace(byGroup: Record<string, {
+  team_id: string;
+  points: number;
+  goals_for: number;
+  goals_against: number;
+  played: number;
+}[]>): Set<string> {
+  const thirdPlace = Object.values(byGroup)
+    .map(standings => {
+      const sorted = [...standings].sort((a, b) =>
+        b.points - a.points || (b.goals_for - b.goals_against) - (a.goals_for - a.goals_against) || b.goals_for - a.goals_for
+      );
+      return sorted[2] ?? null;
+    })
+    .filter((s): s is NonNullable<typeof s> => s != null && s.played > 0);
+
+  const top4 = [...thirdPlace]
+    .sort((a, b) =>
+      b.points - a.points || (b.goals_for - b.goals_against) - (a.goals_for - a.goals_against) || b.goals_for - a.goals_for
+    )
+    .slice(0, 4);
+
+  return new Set(top4.map(s => s.team_id));
+}
+
+export function getGroupOfDeath(byGroup: Record<string, { team?: { fifa_rank?: number | null } | null }[]>): string {
+  let hardestGroup = '';
+  let lowestAvgRank = Infinity;
+  for (const [g, standings] of Object.entries(byGroup)) {
+    const ranks = standings
+      .map(s => s.team?.fifa_rank)
+      .filter((r): r is number => r != null)
+      .sort((a, b) => a - b)
+      .slice(0, 2);
+    if (ranks.length < 2) continue;
+    const avg = (ranks[0] + ranks[1]) / 2;
+    if (avg < lowestAvgRank) { lowestAvgRank = avg; hardestGroup = g; }
+  }
+  return hardestGroup;
+}
+
 export function getCurrentStage(): string {
   const now = new Date();
   const start = TOURNAMENT_START;

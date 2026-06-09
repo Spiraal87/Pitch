@@ -12,10 +12,18 @@ interface MatchCardProps {
   compact?: boolean;
 }
 
+function isLive(dateStr: string, hasResult: boolean): boolean {
+  if (hasResult) return false;
+  const start = new Date(dateStr).getTime();
+  const now = Date.now();
+  return now >= start && now <= start + 115 * 60 * 1000;
+}
+
 export default function MatchCard({ match, compact = false }: MatchCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isResult = match.home_score !== null && match.away_score !== null;
-  const groupLabel = match.group_letter ? `GROUP ${match.group_letter}` : match.stage?.toUpperCase() ?? '';
+  const live = isLive(match.date, isResult);
+  const groupLabel = match.group_letter ? `GROUP ${match.group_letter}` : (match.stage?.replace(/_/g, ' ').toUpperCase() ?? '');
   const venue = getMatchVenue(match.home_team_id, match.away_team_id);
   const locationLabel = venue ? `${venue.city}` : null;
   const homeName = match.home_team?.name ?? match.home_team_id;
@@ -55,9 +63,17 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
       <div onClick={() => setIsModalOpen(true)} className="cursor-pointer">
         <div className="bg-pitch-white border border-pitch-rule rounded-lg overflow-hidden mx-[18px] my-3 shadow-sm card-hover">
           <div className="px-4 py-4">
-            <p className="font-sans text-[10px] uppercase tracking-wider text-pitch-ink-light mb-2">
-              {groupLabel} · <LocalKickoff date={match.date} />{locationLabel ? ` · ${locationLabel}` : ''}
-            </p>
+            <div className="flex items-center gap-2 mb-2">
+              <p className="font-sans text-[10px] uppercase tracking-wider text-pitch-ink-light">
+                {groupLabel} · <LocalKickoff date={match.date} />{locationLabel ? ` · ${locationLabel}` : ''}
+              </p>
+              {live && (
+                <span className="flex items-center gap-1 bg-red-500 text-white font-sans text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full leading-none">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse inline-block" />
+                  Live
+                </span>
+              )}
+            </div>
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="font-sans text-[14px] font-medium text-pitch-ink flex items-center gap-1.5">
@@ -92,6 +108,11 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
               </div>
             </>
           )}
+          <div className="border-t border-pitch-rule px-4 py-2 flex justify-end">
+            <p className="font-sans text-[10px] uppercase tracking-[0.10em] text-pitch-ink-light/60">
+              Tap for details →
+            </p>
+          </div>
         </div>
       </div>
       <MatchModal match={match} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

@@ -4,6 +4,7 @@ import Masthead from '@/components/Masthead';
 import SectionFlag from '@/components/SectionFlag';
 import AskBar from '@/components/AskBar';
 import GroupCard from '@/components/GroupCard';
+import { getGroupOfDeath, getTop4ThirdPlace } from '@/lib/utils';
 
 const ALL_GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
 
@@ -17,6 +18,7 @@ async function getAllStandings() {
 
 export const dynamic = 'force-dynamic';
 
+
 export default async function GroupsPage() {
   const standings = await getAllStandings() as Standing[];
 
@@ -26,6 +28,9 @@ export default async function GroupsPage() {
     acc[g].push(s);
     return acc;
   }, {});
+
+  const groupOfDeath = getGroupOfDeath(byGroup);
+  const maybeTeamIds = getTop4ThirdPlace(byGroup);
 
   return (
     <>
@@ -42,6 +47,8 @@ export default async function GroupsPage() {
                   group={g}
                   standings={groupStandings}
                   showFavorite
+                  isGroupOfDeath={g === groupOfDeath}
+                  maybeTeamIds={maybeTeamIds}
                 />
               );
             })}

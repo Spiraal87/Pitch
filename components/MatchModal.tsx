@@ -29,7 +29,7 @@ async function fetchMatchDetail(homeId: string, awayId: string): Promise<MatchDe
       .select('id, name, position, image_url, team:teams(name)')
       .eq('is_featured', true)
       .in('team_id', [homeId, awayId])
-      .limit(6),
+      .limit(20),
   ]);
   return {
     standings: (standingsRes.data ?? []) as Standing[],
@@ -65,7 +65,7 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
 
   const isResult = match.home_score !== null && match.away_score !== null;
   const dateLabel = formatMatchDate(match.date);
-  const groupLabel = match.group_letter ? `GROUP ${match.group_letter}` : match.stage?.toUpperCase() ?? '';
+  const groupLabel = match.group_letter ? `GROUP ${match.group_letter}` : (match.stage?.replace(/_/g, ' ').toUpperCase() ?? '');
   const venue = getMatchVenue(match.home_team_id, match.away_team_id);
   const locationLabel = venue ? `${venue.city}, ${venue.country}` : null;
   const homeName = match.home_team?.name ?? match.home_team_id;
@@ -157,7 +157,7 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
                 </div>
               ) : preview ? (
                 <p className="font-sans text-[13px] text-pitch-ink leading-[1.6]">
-                  {preview}
+                  {preview.replace(/^#+\s+[^\n]*\n*/gm, '').replace(/\*\*/g, '').trim()}
                 </p>
               ) : (match.home_team?.bio_text || match.away_team?.bio_text) ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -216,8 +216,8 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
               <div className="grid grid-cols-2 gap-3">
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {[
-                  detail.players.filter((p: any) => p.team?.name === homeName).slice(0, 2),
-                  detail.players.filter((p: any) => p.team?.name === awayName).slice(0, 2),
+                  detail.players.filter((p: any) => p.team?.name === homeName).slice(0, 3),
+                  detail.players.filter((p: any) => p.team?.name === awayName).slice(0, 3),
                 ].map((players, i) => (
                   <div key={i} className="space-y-2">
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
