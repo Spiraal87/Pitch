@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Player } from '@/lib/types';
-import { playerSlug, getInitials } from '@/lib/utils';
+import { playerSlug } from '@/lib/utils';
 
 interface PlayerCardProps {
   player: Player;
@@ -27,18 +27,12 @@ export default function PlayerCard({ player, showTeam = false }: PlayerCardProps
     <Link href={`/players/${playerSlug(player.name)}`}>
       <div className="group flex gap-3 px-[18px] py-3 border-b border-pitch-rule hover:bg-[#F0F5EA] hover:border-l-2 hover:border-l-pitch-green cursor-pointer">
         <div className="flex-shrink-0 w-[40px] h-[40px] rounded-full overflow-hidden bg-pitch-green-light flex items-center justify-center">
-          {player.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={player.image_url}
-              alt={player.name}
-              className="w-full h-full object-cover object-top"
-            />
-          ) : (
-            <span className="font-sans text-[11px] font-medium text-pitch-green">
-              {getInitials(player.name)}
-            </span>
-          )}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={player.image_url ?? '/player-placeholder.svg'}
+            alt={player.name}
+            className="w-full h-full object-cover object-top"
+          />
         </div>
         <div className="min-w-0">
           <p className="font-sans text-[13px] font-medium text-pitch-ink leading-tight group-hover:text-pitch-green">

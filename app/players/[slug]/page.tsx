@@ -50,18 +50,12 @@ export default async function PlayerPage({ params }: { params: { slug: string } 
           <div className="flex items-start gap-4">
             {/* Avatar / photo */}
             <div className="flex-shrink-0 w-[64px] h-[64px] rounded-full overflow-hidden bg-pitch-green-light flex items-center justify-center">
-              {player.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={player.image_url}
-                  alt={player.name}
-                  className="w-full h-full object-cover object-top"
-                />
-              ) : (
-                <span className="font-sans text-[18px] font-medium text-pitch-green">
-                  {player.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
-                </span>
-              )}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={player.image_url ?? '/player-placeholder.svg'}
+                alt={player.name}
+                className="w-full h-full object-cover object-top"
+              />
             </div>
 
             <div>

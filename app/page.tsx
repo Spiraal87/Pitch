@@ -15,6 +15,7 @@ import WorldCupBanner from '@/components/WorldCupBanner';
 import TeamFinder from '@/components/TeamFinder';
 import FaqAccordion from '@/components/FaqAccordion';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const FEATURED_TEAM_ORDER = ['Spain', 'Argentina', 'France', 'Brazil', 'England', 'Norway'];
 
@@ -275,6 +276,15 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
         {/* Hero */}
         <div className="px-[18px] py-6 text-center">
           <div className="mb-6">
+            <div className="h-[180px] overflow-hidden mx-auto w-[240px] mb-4 rounded-full">
+              <Image
+                src="/worldcup-logo.png"
+                alt="FIFA World Cup 2026"
+                width={240}
+                height={270}
+                className="object-contain object-top w-full"
+              />
+            </div>
             <p className="font-serif text-[25px] font-semibold leading-[1.12] text-pitch-ink">
               48 teams. 3 host nations. One trophy.
             </p>
