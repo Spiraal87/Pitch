@@ -41,12 +41,25 @@ async function fetchMatchDetail(homeId: string, awayId: string): Promise<MatchDe
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) {
   const [detail, setDetail] = useState<MatchDetail | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
     setDetail(null);
+    setPreview(null);
     fetchMatchDetail(match.home_team_id, match.away_team_id).then(setDetail);
-  }, [isOpen, match.home_team_id, match.away_team_id]);
+
+    // Fetch AI match preview for upcoming matches
+    const isResult = match.home_score !== null && match.away_score !== null;
+    if (!isResult) {
+      setPreviewLoading(true);
+      fetch(`/api/match-preview/${match.id}`)
+        .then(r => r.json())
+        .then(data => { if (data.preview) setPreview(data.preview); })
+        .finally(() => setPreviewLoading(false));
+    }
+  }, [isOpen, match.id, match.home_team_id, match.away_team_id, match.home_score, match.away_score]);
 
   if (!isOpen) return null;
 
@@ -130,29 +143,54 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
             </div>
           )}
 
-          {/* Team Bios */}
-          {(match.home_team?.bio_text || match.away_team?.bio_text) && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {match.home_team?.bio_text && (
-                <Link href={`/teams/${teamSlug(homeName)}`} className="px-3 py-2.5 bg-pitch-cream rounded-lg hover:bg-[#E8F0E2] transition-colors block">
-                  <p className="font-sans text-[10px] uppercase tracking-widest text-pitch-green font-medium mb-1.5">
-                    {homeName} →
-                  </p>
-                  <p className="font-sans text-[12px] text-pitch-ink leading-[1.5]">
-                    {match.home_team.bio_text.split('.')[0]}.
-                  </p>
-                </Link>
-              )}
-              {match.away_team?.bio_text && (
-                <Link href={`/teams/${teamSlug(awayName)}`} className="px-3 py-2.5 bg-pitch-cream rounded-lg hover:bg-[#E8F0E2] transition-colors block">
-                  <p className="font-sans text-[10px] uppercase tracking-widest text-pitch-green font-medium mb-1.5">
-                    {awayName} →
-                  </p>
-                  <p className="font-sans text-[12px] text-pitch-ink leading-[1.5]">
-                    {match.away_team.bio_text.split('.')[0]}.
-                  </p>
-                </Link>
-              )}
+          {/* AI Match Preview */}
+          {!isResult && (
+            <div className="space-y-2">
+              <p className="font-sans text-[11px] uppercase tracking-widest text-pitch-ink-light font-medium">
+                Match Preview
+              </p>
+              {previewLoading ? (
+                <div className="space-y-2 animate-pulse">
+                  <div className="h-3 bg-pitch-rule rounded w-full" />
+                  <div className="h-3 bg-pitch-rule rounded w-5/6" />
+                  <div className="h-3 bg-pitch-rule rounded w-full" />
+                  <div className="h-3 bg-pitch-rule rounded w-4/6 mt-3" />
+                  <div className="h-3 bg-pitch-rule rounded w-full" />
+                  <div className="h-3 bg-pitch-rule rounded w-5/6 mt-3" />
+                  <div className="h-3 bg-pitch-rule rounded w-3/4" />
+                </div>
+              ) : preview ? (
+                <div className="space-y-3">
+                  {preview.split('\n\n').filter(Boolean).map((para, i) => (
+                    <p key={i} className="font-sans text-[13px] text-pitch-ink leading-[1.6]">
+                      {para}
+                    </p>
+                  ))}
+                </div>
+              ) : (match.home_team?.bio_text || match.away_team?.bio_text) ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {match.home_team?.bio_text && (
+                    <Link href={`/teams/${teamSlug(homeName)}`} className="px-3 py-2.5 bg-pitch-cream rounded-lg hover:bg-[#E8F0E2] transition-colors block">
+                      <p className="font-sans text-[10px] uppercase tracking-widest text-pitch-green font-medium mb-1.5">
+                        {homeName} →
+                      </p>
+                      <p className="font-sans text-[12px] text-pitch-ink leading-[1.5]">
+                        {match.home_team.bio_text.split('.')[0]}.
+                      </p>
+                    </Link>
+                  )}
+                  {match.away_team?.bio_text && (
+                    <Link href={`/teams/${teamSlug(awayName)}`} className="px-3 py-2.5 bg-pitch-cream rounded-lg hover:bg-[#E8F0E2] transition-colors block">
+                      <p className="font-sans text-[10px] uppercase tracking-widest text-pitch-green font-medium mb-1.5">
+                        {awayName} →
+                      </p>
+                      <p className="font-sans text-[12px] text-pitch-ink leading-[1.5]">
+                        {match.away_team.bio_text.split('.')[0]}.
+                      </p>
+                    </Link>
+                  )}
+                </div>
+              ) : null}
             </div>
           )}
 
