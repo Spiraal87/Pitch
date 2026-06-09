@@ -38,9 +38,9 @@ export const metadata: Metadata = {
     siteName: "PitchGuide",
     images: [
       {
-        url: "https://pitchguide.app/pitchguide_no_timer.png",
-        width: 737,
-        height: 1124,
+        url: "https://pitchguide.app/pitchguide-og.png",
+        width: 745,
+        height: 1010,
         alt: "PitchGuide - Understand the Game",
         type: "image/png",
       },
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PitchGuide - Understand the Game",
     description: "Sports intelligence for the 2026 FIFA World Cup",
-    images: ["https://pitchguide.app/pitchguide_no_timer.png"],
+    images: ["https://pitchguide.app/pitchguide-og.png"],
     creator: "@pitch",
   },
   alternates: {
