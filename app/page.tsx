@@ -305,7 +305,7 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
           </p>
           <Link
             href="/?live=1"
-            className="inline-flex items-center gap-1.5 font-sans text-[13px] font-medium text-pitch-green hover:text-pitch-green-mid"
+            className="block w-full text-center bg-pitch-white text-pitch-green border-2 border-pitch-green font-sans text-[13px] font-medium py-2.5 rounded-lg hover:bg-pitch-green-light/50 transition-colors active:scale-95"
           >
             Preview the live experience →
           </Link>
