@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="flex flex-col gap-4">
           <div>
             <p className="font-serif text-[14px] font-medium text-pitch-ink mb-2">
-              Pitch
+              PitchGuide
             </p>
             <p className="font-sans text-[12px] text-pitch-ink-mid leading-[1.6]">
               A sports intelligence app for fans, newcomers, and everyone in between. Understand the game, not just the score.
@@ -27,7 +27,7 @@ export default function Footer() {
           </div>
 
           <p className="font-sans text-[11px] text-pitch-ink-light pt-2 border-t border-pitch-rule">
-            © 2026 Pitch. Built with Next.js and Anthropic Claude.
+            © 2026 PitchGuide. Built with Next.js and Anthropic Claude.
           </p>
         </div>
       </div>

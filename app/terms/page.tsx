@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Masthead from '@/components/Masthead';
 
 export const metadata = {
-  title: 'Terms of Use — Pitch',
+  title: 'Terms of Use — PitchGuide',
 };
 
 export default function TermsPage() {
@@ -27,14 +27,14 @@ export default function TermsPage() {
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Agreement to Terms</h2>
               <p>
-                By accessing Pitch, you agree to these terms of use. If you do not agree, please do not use the app.
+                By accessing PitchGuide, you agree to these terms of use. If you do not agree, please do not use the app.
               </p>
             </div>
 
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Use License</h2>
               <p>
-                You may access and use Pitch for personal, non-commercial purposes. You agree not to:
+                You may access and use PitchGuide for personal, non-commercial purposes. You agree not to:
               </p>
               <ul className="list-disc list-inside space-y-1 ml-2">
                 <li>Reproduce, modify, or distribute content without permission</li>
@@ -47,14 +47,14 @@ export default function TermsPage() {
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Disclaimer of Warranties</h2>
               <p>
-                Pitch is provided &quot;as is&quot; without warranties of any kind, either express or implied. We do not guarantee the accuracy, completeness, or reliability of the content or AI-generated responses.
+                PitchGuide is provided &quot;as is&quot; without warranties of any kind, either express or implied. We do not guarantee the accuracy, completeness, or reliability of the content or AI-generated responses.
               </p>
             </div>
 
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Limitation of Liability</h2>
               <p>
-                Pitch and its creators will not be liable for any indirect, incidental, or consequential damages arising from your use of the app.
+                PitchGuide and its creators will not be liable for any indirect, incidental, or consequential damages arising from your use of the app.
               </p>
             </div>
 
@@ -68,7 +68,7 @@ export default function TermsPage() {
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Changes to Terms</h2>
               <p>
-                We may update these terms at any time. Your continued use of Pitch constitutes acceptance of changes.
+                We may update these terms at any time. Your continued use of PitchGuide constitutes acceptance of changes.
               </p>
             </div>
 

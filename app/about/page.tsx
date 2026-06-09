@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Masthead from '@/components/Masthead';
 
 export const metadata = {
-  title: 'About — Pitch',
+  title: 'About — PitchGuide',
 };
 
 export default function AboutPage() {
@@ -20,16 +20,16 @@ export default function AboutPage() {
         {/* Content */}
         <div className="prose prose-sm max-w-none">
           <h1 className="font-serif text-[28px] font-medium text-pitch-ink mb-4">
-            About Pitch
+            About PitchGuide
           </h1>
 
           <div className="space-y-4 font-sans text-[14px] text-pitch-ink-mid leading-[1.7]">
             <p>
-              Pitch is a sports intelligence app for fans, newcomers, and everyone in between. Our mission is simple: <strong className="text-pitch-ink">understand the game, not just the score.</strong>
+              PitchGuide is a sports intelligence app for fans, newcomers, and everyone in between. Our mission is simple: <strong className="text-pitch-ink">understand the game, not just the score.</strong>
             </p>
 
             <p>
-              Traditional sports coverage assumes you follow every league and know every player. Pitch doesn&apos;t. We provide editorial context, team stories, player profiles, and AI-powered briefings in plain English — so any fan can follow along, no matter how closely they follow the sport.
+              Traditional sports coverage assumes you follow every league and know every player. PitchGuide doesn&apos;t. We provide editorial context, team stories, player profiles, and AI-powered briefings in plain English — so any fan can follow along, no matter how closely they follow the sport.
             </p>
 
             <div className="border-l-2 border-pitch-green pl-4 py-1">

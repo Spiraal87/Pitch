@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Masthead from '@/components/Masthead';
 
 export const metadata = {
-  title: 'Privacy Policy — Pitch',
+  title: 'Privacy Policy — PitchGuide',
 };
 
 export default function PrivacyPage() {
@@ -27,7 +27,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Data Collection</h2>
               <p>
-                Pitch does not require an account. We do not collect personal information like your name, email, or location.
+                PitchGuide does not require an account. We do not collect personal information like your name, email, or location.
               </p>
             </div>
 
@@ -44,14 +44,14 @@ export default function PrivacyPage() {
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Analytics</h2>
               <p>
-                Pitch may install analytics in the future to understand how users interact with the app. When we do, we will update this policy. Analytics will be anonymized and will not track personal information.
+                PitchGuide uses PostHog to understand how users interact with the app. Analytics are anonymized and do not track personal information.
               </p>
             </div>
 
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Third-Party Services</h2>
               <p>
-                Pitch uses the following third-party services:
+                PitchGuide uses the following third-party services:
               </p>
               <ul className="list-disc list-inside space-y-1 ml-2">
                 <li>
@@ -77,7 +77,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="font-medium text-pitch-ink text-[15px] mb-2">Cookies</h2>
               <p>
-                Pitch uses session storage to track your question count within a browser session. No persistent cookies are set.
+                PitchGuide uses session storage to track your question count within a browser session. No persistent cookies are set.
               </p>
             </div>
 
