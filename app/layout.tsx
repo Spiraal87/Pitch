@@ -34,13 +34,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PitchGuide - Understand the Game",
     description: "Sports intelligence for the 2026 FIFA World Cup. Plain English context, team stories, and AI briefings for fans.",
-    url: "https://pitchguide.vercel.app",
+    url: "https://pitchguide.app",
     siteName: "PitchGuide",
     images: [
       {
-        url: "https://pitchguide.vercel.app/pitchguide_no_timer.png",
-        width: 1200,
-        height: 630,
+        url: "https://pitchguide.app/pitchguide_no_timer.png",
+        width: 737,
+        height: 1124,
         alt: "PitchGuide - Understand the Game",
         type: "image/png",
       },
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "PitchGuide - Understand the Game",
     description: "Sports intelligence for the 2026 FIFA World Cup",
-    images: ["https://pitchguide.vercel.app/pitchguide_no_timer.png"],
+    images: ["https://pitchguide.app/pitchguide_no_timer.png"],
     creator: "@pitch",
   },
   alternates: {
