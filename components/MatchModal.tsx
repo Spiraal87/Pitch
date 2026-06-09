@@ -153,20 +153,12 @@ export default function MatchModal({ match, isOpen, onClose }: MatchModalProps) 
                 <div className="space-y-2 animate-pulse">
                   <div className="h-3 bg-pitch-rule rounded w-full" />
                   <div className="h-3 bg-pitch-rule rounded w-5/6" />
-                  <div className="h-3 bg-pitch-rule rounded w-full" />
-                  <div className="h-3 bg-pitch-rule rounded w-4/6 mt-3" />
-                  <div className="h-3 bg-pitch-rule rounded w-full" />
-                  <div className="h-3 bg-pitch-rule rounded w-5/6 mt-3" />
-                  <div className="h-3 bg-pitch-rule rounded w-3/4" />
+                  <div className="h-3 bg-pitch-rule rounded w-4/6" />
                 </div>
               ) : preview ? (
-                <div className="space-y-3">
-                  {preview.split('\n\n').filter(Boolean).map((para, i) => (
-                    <p key={i} className="font-sans text-[13px] text-pitch-ink leading-[1.6]">
-                      {para}
-                    </p>
-                  ))}
-                </div>
+                <p className="font-sans text-[13px] text-pitch-ink leading-[1.6]">
+                  {preview}
+                </p>
               ) : (match.home_team?.bio_text || match.away_team?.bio_text) ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {match.home_team?.bio_text && (

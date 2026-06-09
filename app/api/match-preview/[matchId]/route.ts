@@ -40,21 +40,16 @@ export async function GET(
 
   const msg = await anthropic.messages.create({
     model: 'claude-haiku-4-5',
-    max_tokens: 450,
+    max_tokens: 120,
     messages: [{
       role: 'user',
-      content: `Write a match preview for ${homeName} vs ${awayName} at the 2026 FIFA World Cup (${stage}, ${dateStr}).
+      content: `Write a 2-3 sentence match preview for ${homeName} vs ${awayName} at the 2026 FIFA World Cup (${stage}, ${dateStr}).
 
 Team context:
 - ${homeName} (${homeRank}): ${homeBio}
 - ${awayName} (${awayRank}): ${awayBio}
 
-Write exactly 3 short paragraphs for someone who doesn't follow soccer. Each paragraph covers one of these angles:
-1. The story — what narrative or rivalry makes this match interesting beyond just the result
-2. What's at stake — group implications, pressure, what a win/loss means for each team's tournament
-3. One thing to watch — a specific player duel, tactical battle, or wild card that could decide it
-
-Rules: Plain English. No bullet points. 2-3 sentences per paragraph. Don't use the word "crucial". Don't use headers or labels.`,
+Cover what's at stake and one reason a casual fan should care. Plain English, no jargon, no bullet points. Don't use the word "crucial".`,
     }],
   });
 
