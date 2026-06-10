@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Standing } from '@/lib/types';
 import Flag from '@/components/Flag';
 
+const HOST_NATIONS = new Set(['Mexico', 'USA', 'Canada']);
+
 interface GroupCardProps {
   group: string;
   standings: Standing[];
@@ -54,6 +56,12 @@ export default function GroupCard({ group, standings, showFavorite = false, show
                   <span className="font-sans text-[12px] text-pitch-ink truncate flex items-center gap-1.5">
                     <Flag name={s.team?.name ?? s.team_id} />
                     <span>{s.team?.name ?? s.team_id}</span>
+                    {s.team?.fifa_rank && (
+                      <span className="font-sans text-[9px] text-pitch-ink-light flex-shrink-0">#{s.team.fifa_rank}</span>
+                    )}
+                    {HOST_NATIONS.has(s.team?.name ?? '') && (
+                      <span className="font-sans text-[8px] uppercase tracking-[0.05em] font-medium px-1 py-0.5 rounded bg-amber-50 text-amber-600 border border-amber-200 leading-none flex-shrink-0">Host</span>
+                    )}
                   </span>
                   {showFavorite && i === 0 && (
                     <span className="bg-pitch-green text-white font-sans text-[9px] font-medium px-1 py-0.5 rounded leading-none ml-0.5 flex-shrink-0">
