@@ -4,8 +4,21 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-function teamId(name: string): string {
-  return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+// Matches the TEAM_NAME_MAP in scripts/seed.ts — must stay in sync
+const TEAM_NAME_MAP: Record<string, string> = {
+  'United States': 'USA',
+  'Korea Republic': 'South Korea',
+  'Turkey': 'Türkiye',
+  "Côte d'Ivoire": 'Ivory Coast',
+  'Congo DR': 'DR Congo',
+  'Bosnia and Herzegovina': 'Bosnia-Herzegovina',
+  'Curacao': 'Curaçao',
+};
+
+function teamId(name: string | null): string {
+  if (!name) return 'tbd';
+  const mapped = TEAM_NAME_MAP[name] ?? name;
+  return mapped.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
 
 async function generateContextLine(
@@ -141,7 +154,48 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 4. Generate context lines for upcoming matches without one
+    // 4. Sync player goals/assists from scorers endpoint
+    const scorersRes = await fetch(
+      'https://api.football-data.org/v4/competitions/WC/scorers?season=2026&limit=30',
+      { headers: { 'X-Auth-Token': apiKey } }
+    );
+
+    if (scorersRes.ok) {
+      const scorersData = await scorersRes.json();
+      const scorers: Array<{
+        player: { name: string };
+        team: { name: string };
+        goals: number;
+        assists: number | null;
+        penalties: number;
+      }> = scorersData.scorers ?? [];
+
+      // Known name mappings from football-data.org → our player IDs
+      const PLAYER_NAME_MAP: Record<string, string> = {
+        'Vinicius Junior': 'vinicius-jr',
+        'Vinícius Júnior': 'vinicius-jr',
+        'Kylian Mbappé': 'kylian-mbappe',
+        'Kylian Mbappe': 'kylian-mbappe',
+      };
+
+      const playerSlug = (name: string) =>
+        name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+      for (const scorer of scorers) {
+        const playerId = PLAYER_NAME_MAP[scorer.player.name] ?? playerSlug(scorer.player.name);
+        const teamDbId = teamId(scorer.team.name);
+
+        await supabase.from('players').upsert({
+          id: playerId,
+          name: scorer.player.name,
+          team_id: teamDbId,
+          goals: scorer.goals,
+          assists: scorer.assists ?? 0,
+        }, { onConflict: 'id', ignoreDuplicates: false });
+      }
+    }
+
+    // 5. Generate context lines for upcoming matches without one
     const today = new Date();
     const nextWeek = new Date(today);
     nextWeek.setDate(today.getDate() + 7);
@@ -177,7 +231,7 @@ export async function GET(req: NextRequest) {
         .eq('id', m.id);
     }
 
-    // 5. Generate daily briefing
+    // 6. Generate daily briefing
     const todayStr = today.toISOString().split('T')[0];
 
     const { data: todayMatchData } = await supabase

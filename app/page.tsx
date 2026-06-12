@@ -181,15 +181,17 @@ async function getHomeData(forceLive = false) {
     };
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // Use Pacific Time for day boundaries — the westernmost host cities are in PDT (UTC-7).
+  // This prevents late PT matches (e.g. 6 PM PDT = 01:00 UTC next day) from landing in tomorrow's bucket.
+  const ptDateStr = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+  const today = new Date(ptDateStr + 'T00:00:00-07:00');
   const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
+  tomorrow.setUTCDate(today.getUTCDate() + 1);
   const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
+  yesterday.setUTCDate(today.getUTCDate() - 1);
 
   const threeDaysOut = new Date(today);
-  threeDaysOut.setDate(today.getDate() + 4);
+  threeDaysOut.setUTCDate(today.getUTCDate() + 4);
 
   const [teamsRes, todayRes, yesterdayRes, upcomingRes, allStandingsRes, topPlayersRes, playersRes, allCompletedRes] = await Promise.all([
     supabase
@@ -524,16 +526,42 @@ function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof g
           <TeamFinder teams={allTeams} />
         </div>
 
-        {/* Today's matches */}
-        <div id="today" />
-        <SectionFlag label="Today's matches" />
-        {data.todayMatches.length > 0 ? (
-          (data.todayMatches as Match[]).map((m) => <MatchCard key={m.id} match={m} />)
-        ) : (
-          <p className="px-[18px] py-3 font-sans text-[13px] text-pitch-ink-light border-b border-pitch-rule">
-            No matches today.
-          </p>
-        )}
+        {/* Today's results (completed) */}
+        {(() => {
+          const todayResults = (data.todayMatches as Match[]).filter((m) => m.home_score !== null);
+          const todayUpcoming = (data.todayMatches as Match[]).filter((m) => m.home_score === null);
+          return (
+            <>
+              {todayResults.length > 0 && (
+                <>
+                  <div id="today" />
+                  <SectionFlag label="Today's results" />
+                  {todayResults.map((m) => <MatchCard key={m.id} match={m} compact />)}
+                  {todayUpcoming.length > 0 && (
+                    <>
+                      <div className="border-t-2 border-pitch-rule mt-4" />
+                      <SectionFlag label="Today's matches" />
+                      {todayUpcoming.map((m) => <MatchCard key={m.id} match={m} />)}
+                    </>
+                  )}
+                </>
+              )}
+              {todayResults.length === 0 && (
+                <>
+                  <div id="today" />
+                  <SectionFlag label="Today's matches" />
+                  {todayUpcoming.length > 0 ? (
+                    todayUpcoming.map((m) => <MatchCard key={m.id} match={m} />)
+                  ) : (
+                    <p className="px-[18px] py-3 font-sans text-[13px] text-pitch-ink-light border-b border-pitch-rule">
+                      No matches today.
+                    </p>
+                  )}
+                </>
+              )}
+            </>
+          );
+        })()}
 
         {/* Yesterday's results */}
         <div className="border-t-2 border-pitch-rule mt-4" />

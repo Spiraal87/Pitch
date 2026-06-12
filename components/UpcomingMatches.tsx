@@ -10,10 +10,10 @@ interface UpcomingMatchesProps {
 export default function UpcomingMatches({ matches }: UpcomingMatchesProps) {
   if (!matches.length) return null;
 
-  // Group by date, show max 2 days
+  // Group by date in Pacific Time so late PT matches (e.g. 6 PM PDT = 01:00 UTC next day)
+  // appear under the correct local date label rather than the next UTC day.
   const byDate = matches.reduce<Record<string, Match[]>>((acc, m) => {
-    const d = new Date(m.date);
-    const day = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const day = new Date(m.date).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
     if (!acc[day]) acc[day] = [];
     acc[day].push(m);
     return acc;

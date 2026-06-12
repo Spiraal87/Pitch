@@ -34,7 +34,7 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
       <>
         <div onClick={() => setIsModalOpen(true)} className="px-[18px] py-3 border-b border-pitch-rule hover:bg-pitch-cream cursor-pointer">
           <p className="font-sans text-[10px] uppercase tracking-wider text-pitch-ink-light mb-1">
-            <LocalKickoff date={match.date} />
+            {groupLabel && <>{groupLabel} · </>}<LocalKickoff date={match.date} />{locationLabel ? ` · ${locationLabel}` : ''}
           </p>
           <div className="flex items-center justify-between">
             <div className="font-sans text-[13px] font-medium text-pitch-ink flex items-center gap-1.5">
