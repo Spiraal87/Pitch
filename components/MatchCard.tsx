@@ -36,15 +36,15 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
           <p className="font-sans text-[10px] uppercase tracking-wider text-pitch-ink-light mb-1">
             {groupLabel && <>{groupLabel} · </>}<LocalKickoff date={match.date} />{locationLabel ? ` · ${locationLabel}` : ''}
           </p>
-          <div className="flex items-center justify-between">
-            <div className="font-sans text-[13px] font-medium text-pitch-ink flex items-center gap-1.5">
+          <div className="flex items-center">
+            <div className="flex-1 font-sans text-[13px] font-medium text-pitch-ink flex items-center gap-1.5">
               <Flag name={homeName} />
               <span>{homeName}</span>
             </div>
-            <span className="font-serif text-[16px] font-medium text-pitch-ink px-3">
+            <span className="font-serif text-[16px] font-medium text-pitch-ink w-16 text-center tabular-nums flex-shrink-0">
               {match.home_score} – {match.away_score}
             </span>
-            <div className="font-sans text-[13px] font-medium text-pitch-ink flex items-center justify-end gap-1.5">
+            <div className="flex-1 font-sans text-[13px] font-medium text-pitch-ink flex items-center justify-end gap-1.5">
               <span>{awayName}</span>
               <Flag name={awayName} />
             </div>

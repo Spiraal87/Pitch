@@ -15,7 +15,7 @@ interface GroupCardProps {
 
 export default function GroupCard({ group, standings, showFavorite = false, showStats = true, isGroupOfDeath = false, maybeTeamIds }: GroupCardProps) {
   const sorted = [...standings].sort((a, b) => b.points - a.points || b.goals_for - a.goals_for);
-  const tournamentStarted = showStats && sorted.some(s => s.played > 0);
+  const tournamentStarted = showStats;
 
   return (
     <Link href={`/groups/${group.toLowerCase()}`}>
