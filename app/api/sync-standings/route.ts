@@ -1,8 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServiceClient } from '@/lib/supabase';
 
-function teamId(name: string): string {
-  return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+const TEAM_NAME_MAP: Record<string, string> = {
+  'United States': 'USA',
+  'Korea Republic': 'South Korea',
+  'Turkey': 'Türkiye',
+  "Côte d'Ivoire": 'Ivory Coast',
+  'Congo DR': 'DR Congo',
+  'Bosnia and Herzegovina': 'Bosnia-Herzegovina',
+  'Curacao': 'Curaçao',
+  'Cape Verde Islands': 'Cape Verde',
+};
+
+function teamId(name: string | null): string | null {
+  if (!name) return null;
+  const mapped = TEAM_NAME_MAP[name] ?? name;
+  return mapped.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || null;
 }
 
 export async function GET(req: NextRequest) {
@@ -53,10 +66,15 @@ export async function GET(req: NextRequest) {
       stage: m.stage === 'GROUP_STAGE' ? 'group' : m.stage.toLowerCase(),
     }));
 
-    await supabase.from('matches').upsert(matchRows, { onConflict: 'id' });
+    // Filter out TBD/unknown teams — FK violations abort the entire batch
+    const validMatchRows = matchRows.filter((m: { home_team_id: string | null; away_team_id: string | null }) =>
+      m.home_team_id !== null && m.away_team_id !== null
+    );
+    const { error: matchUpsertError } = await supabase.from('matches').upsert(validMatchRows, { onConflict: 'id' });
+    if (matchUpsertError) console.error('Match upsert error:', matchUpsertError);
 
     // Recalculate group standings from completed matches
-    const completed = matchRows.filter((m: { home_score: number | null }) => m.home_score !== null);
+    const completed = validMatchRows.filter((m: { home_score: number | null }) => m.home_score !== null);
 
     const table: Record<string, {
       team_id: string; group_letter: string;
@@ -131,7 +149,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      matchesUpdated: matchRows.length,
+      matchesUpdated: validMatchRows.length,
       standingsUpdated: Object.keys(table).length,
       scorersUpdated,
     });
