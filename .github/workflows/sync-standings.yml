@@ -12,6 +12,12 @@ jobs:
     steps:
       - name: Sync scores and standings
         run: |
-          curl -s -o /dev/null -w "%{http_code}" \
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "${{ secrets.APP_URL }}/api/sync-standings"
+            "${{ secrets.APP_URL }}/api/sync-standings")
+          echo "$RESPONSE"
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "Sync failed with status $HTTP_STATUS"
+            exit 1
+          fi
