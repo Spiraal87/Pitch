@@ -13,12 +13,14 @@ const TEAM_NAME_MAP: Record<string, string> = {
   'Congo DR': 'DR Congo',
   'Bosnia and Herzegovina': 'Bosnia-Herzegovina',
   'Curacao': 'Curaçao',
+  'Cape Verde Islands': 'Cape Verde',
 };
 
-function teamId(name: string | null): string {
-  if (!name) return 'tbd';
+// Returns null for unknown/TBD teams so FK violations don't abort the batch
+function teamId(name: string | null): string | null {
+  if (!name) return null;
   const mapped = TEAM_NAME_MAP[name] ?? name;
-  return mapped.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  return mapped.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || null;
 }
 
 async function generateContextLine(
@@ -106,10 +108,16 @@ export async function GET(req: NextRequest) {
       stage: m.stage === 'GROUP_STAGE' ? 'group' : m.stage.toLowerCase(),
     }));
 
-    await supabase.from('matches').upsert(matchRows, { onConflict: 'id' });
+    // Only upsert rows where both teams are known — unknown/TBD team IDs cause FK violations
+    // that abort the entire batch, preventing scores from being written for completed matches.
+    const validMatchRows = matchRows.filter((m: { home_team_id: string | null; away_team_id: string | null }) =>
+      m.home_team_id !== null && m.away_team_id !== null
+    );
+    const { error: matchUpsertError } = await supabase.from('matches').upsert(validMatchRows, { onConflict: 'id' });
+    if (matchUpsertError) console.error('Match upsert error:', matchUpsertError);
 
     // 3. Recalculate standings from match results
-    const completedMatches = matchRows.filter((m: { home_score: number | null }) => m.home_score !== null);
+    const completedMatches = validMatchRows.filter((m: { home_score: number | null }) => m.home_score !== null);
 
     const standingsMap: Record<string, {
       team_id: string;
