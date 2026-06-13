@@ -43,9 +43,12 @@ export async function GET(_req: NextRequest) {
     const matchRows = matches.map((m: {
       id: number;
       utcDate: string;
+      status: string;
       homeTeam: { name: string };
       awayTeam: { name: string };
-      score: { fullTime: { home: number | null; away: number | null } };
+      score: {
+        fullTime: { home: number | null; away: number | null };
+      };
       group: string | null;
       matchday: number;
       stage: string;
@@ -54,8 +57,9 @@ export async function GET(_req: NextRequest) {
       date: m.utcDate,
       home_team_id: teamId(m.homeTeam.name),
       away_team_id: teamId(m.awayTeam.name),
-      home_score: m.score?.fullTime?.home ?? null,
-      away_score: m.score?.fullTime?.away ?? null,
+      // Only write scores for FINISHED matches — IN_PLAY fullTime is null until the whistle
+      home_score: m.status === 'FINISHED' ? (m.score?.fullTime?.home ?? null) : null,
+      away_score: m.status === 'FINISHED' ? (m.score?.fullTime?.away ?? null) : null,
       group_letter: m.group?.replace('GROUP_', '') ?? null,
       matchday: m.matchday,
       stage: m.stage === 'GROUP_STAGE' ? 'group' : m.stage.toLowerCase(),
