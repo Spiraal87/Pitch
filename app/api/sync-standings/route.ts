@@ -18,12 +18,7 @@ function teamId(name: string | null): string | null {
   return mapped.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || null;
 }
 
-export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
+export async function GET(_req: NextRequest) {
   const supabase = getServiceClient();
   const apiKey = process.env.FOOTBALL_DATA_API_KEY;
 
