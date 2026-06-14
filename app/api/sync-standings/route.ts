@@ -140,13 +140,13 @@ export async function GET(_req: NextRequest) {
 
         // Try to update stats on an existing player first. If no row matched, insert a minimal record.
         // This avoids clobbering is_featured, image_url, and bio_text for featured players.
-        const { count } = await supabase
+        const { data: updated } = await supabase
           .from('players')
           .update({ goals, assists, name: player.name, team_id: playerTeamId || null })
           .eq('id', playerId)
-          .select('id', { count: 'exact', head: true });
+          .select('id');
 
-        if (!count) {
+        if (!updated?.length) {
           await supabase.from('players').insert({
             id: playerId,
             name: player.name,
