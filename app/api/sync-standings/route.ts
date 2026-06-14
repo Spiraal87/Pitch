@@ -119,28 +119,44 @@ export async function GET(_req: NextRequest) {
       const scorersData = await scorersRes.json();
       const scorers = scorersData.scorers ?? [];
 
+      const PLAYER_NAME_MAP: Record<string, string> = {
+        'Vinicius Junior': 'vinicius-jr',
+        'Vinícius Júnior': 'vinicius-jr',
+        'Kylian Mbappé': 'kylian-mbappe',
+        'Kylian Mbappe': 'kylian-mbappe',
+      };
+      const playerSlug = (name: string) =>
+        name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
       for (const entry of scorers) {
         const player = entry.player;
         const team = entry.team;
         if (!player?.name) continue;
 
-        const playerId = teamId(player.name);
+        const playerId = PLAYER_NAME_MAP[player.name] ?? playerSlug(player.name);
         const playerTeamId = teamId(team?.name ?? '');
         const goals = entry.goals ?? 0;
         const assists = entry.assists ?? 0;
 
-        // Upsert — creates minimal record if player not in DB, updates stats if they are
-        await supabase.from('players').upsert({
-          id: playerId,
-          name: player.name,
-          team_id: playerTeamId || null,
-          position: player.position ?? null,
-          goals,
-          assists,
-          is_featured: false,
-          image_url: null,
-          bio_text: null,
-        }, { onConflict: 'id', ignoreDuplicates: false });
+        // Try to update stats on an existing player first. If no row matched, insert a minimal record.
+        // This avoids clobbering is_featured, image_url, and bio_text for featured players.
+        const { count } = await supabase
+          .from('players')
+          .update({ goals, assists, name: player.name, team_id: playerTeamId || null })
+          .eq('id', playerId)
+          .select('id', { count: 'exact', head: true });
+
+        if (!count) {
+          await supabase.from('players').insert({
+            id: playerId,
+            name: player.name,
+            team_id: playerTeamId || null,
+            position: player.position ?? null,
+            goals,
+            assists,
+            is_featured: false,
+          });
+        }
 
         scorersUpdated++;
       }
