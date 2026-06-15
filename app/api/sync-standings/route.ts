@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServiceClient } from '@/lib/supabase';
 
 const TEAM_NAME_MAP: Record<string, string> = {
@@ -18,7 +18,7 @@ function teamId(name: string | null): string | null {
   return mapped.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || null;
 }
 
-export async function GET(_req: NextRequest) {
+export async function GET() {
   const supabase = getServiceClient();
   const apiKey = process.env.FOOTBALL_DATA_API_KEY;
 
