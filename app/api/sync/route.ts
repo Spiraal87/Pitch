@@ -49,10 +49,10 @@ async function generateDailyBriefing(
 ): Promise<string> {
   const msg = await anthropic.messages.create({
     model: 'claude-haiku-4-5',
-    max_tokens: 300,
+    max_tokens: 500,
     messages: [{
       role: 'user',
-      content: `Write a 3-4 sentence plain English tournament briefing for today (${date}). Cover: who's through, who's in trouble, what happened yesterday, what to watch today. Tone: a friend texting you the highlights. Data: Recent results: ${recentResults}. Today's matches: ${todayMatches}. Standings summary: ${standingsSummary}`,
+      content: `Write a tournament briefing for today (${date}) in 2-3 short paragraphs. Each paragraph should be 2-3 sentences. Paragraph 1: what happened yesterday and who moved through or is in trouble. Paragraph 2: what to watch today and why it matters. Paragraph 3 (optional): one broader storyline or thing that makes the group stage interesting right now. Tone: a friend texting you the highlights — casual, no jargon. Separate paragraphs with a blank line. No heading, no bullet points. Data: Recent results: ${recentResults}. Today's matches: ${todayMatches}. Standings summary: ${standingsSummary}`,
     }],
   });
   return (msg.content[0] as { type: string; text: string }).text;
