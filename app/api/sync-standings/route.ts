@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getServiceClient } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+
 const TEAM_NAME_MAP: Record<string, string> = {
   'United States': 'USA',
   'Korea Republic': 'South Korea',
@@ -18,7 +20,12 @@ function teamId(name: string | null): string | null {
   return mapped.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || null;
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const auth = req.headers.get('authorization');
+  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const supabase = getServiceClient();
   const apiKey = process.env.FOOTBALL_DATA_API_KEY;
 
