@@ -14,7 +14,7 @@ jobs:
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          TARGET_URL="https://pitchguide.vercel.app/api/sync-standings"
+          TARGET_URL="https://pitchguide.app/api/sync-standings"
           echo "Hitting: $TARGET_URL"
           echo "Auth header set: $([ -n "$CRON_SECRET" ] && echo yes || echo NO - secret missing)"
           RESPONSE=$(curl -sL -w "\nHTTP_STATUS:%{http_code}" \
