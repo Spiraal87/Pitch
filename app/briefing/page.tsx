@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import AskBar from '@/components/AskBar';
 import Masthead from '@/components/Masthead';
-import { supabase } from '@/lib/supabase';
+import { getServiceClient } from '@/lib/supabase';
 import { Briefing } from '@/lib/types';
 import { daysUntilTournament, isTournamentLive } from '@/lib/utils';
 
@@ -16,23 +16,34 @@ const LIVE_FALLBACK_UPDATES = [
   'Use the homepage for live matches, standings, and leaders, then come here for a plain-English summary of the bigger story.',
 ];
 
-async function getTodaysBriefing(): Promise<Briefing | null> {
+async function getLatestBriefing(): Promise<{ briefing: Briefing | null; isToday: boolean }> {
+  const supabase = getServiceClient();
   const today = new Date().toISOString().split('T')[0];
-  const { data } = await supabase
+
+  const { data: todayData } = await supabase
     .from('briefings')
     .select('*')
     .eq('date', today)
-    .order('generated_at', { ascending: false })
-    .limit(1)
-    .single();
+    .eq('type', 'daily')
+    .maybeSingle();
 
-  return data ?? null;
+  if (todayData) return { briefing: todayData, isToday: true };
+
+  const { data: recentData } = await supabase
+    .from('briefings')
+    .select('*')
+    .eq('type', 'daily')
+    .order('date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  return { briefing: recentData ?? null, isToday: false };
 }
 
 export const dynamic = 'force-dynamic';
 
 export default async function BriefingPage() {
-  const briefing = await getTodaysBriefing();
+  const { briefing, isToday } = await getLatestBriefing();
   const live = isTournamentLive();
   const days = daysUntilTournament();
 
@@ -65,8 +76,16 @@ export default async function BriefingPage() {
             const lines = briefing.text.split('\n');
             const bodyText = (lines[0].startsWith('#') ? lines.slice(1) : lines).join('\n').trim();
             const paragraphs = bodyText.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+            const briefingDate = new Date(briefing.date + 'T12:00:00').toLocaleDateString('en-US', {
+              weekday: 'long', month: 'long', day: 'numeric',
+            });
             return (
               <div className="border-t border-pitch-rule pt-5">
+                {!isToday && (
+                  <p className="font-sans text-[12px] text-pitch-ink-light italic mb-4">
+                    Today&apos;s briefing hasn&apos;t generated yet — showing {briefingDate}&apos;s overview.
+                  </p>
+                )}
                 <div className="space-y-4">
                   {paragraphs.map((para, i) => (
                     <p key={i} className={`font-sans text-[14px] text-pitch-ink leading-[1.75] ${i === 0 ? 'font-medium' : ''}`}>
@@ -80,7 +99,7 @@ export default async function BriefingPage() {
                   </p>
                   <span className="text-pitch-rule">·</span>
                   <p className="font-sans text-[11px] text-pitch-ink-light">
-                    Next update tomorrow at 6am ET
+                    {isToday ? 'Next update tomorrow at 6am ET' : 'New briefing generates at 6am ET'}
                   </p>
                 </div>
               </div>
