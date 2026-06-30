@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Match } from '@/lib/types';
+import { MatchPrediction } from '@/app/knockout/page';
 import { getMatchVenue } from '@/lib/venues';
 import Flag from '@/components/Flag';
 import LocalKickoff from '@/components/LocalKickoff';
@@ -10,6 +11,7 @@ import MatchModal from '@/components/MatchModal';
 interface MatchCardProps {
   match: Match;
   compact?: boolean;
+  prediction?: MatchPrediction;
 }
 
 function isLive(dateStr: string, hasResult: boolean): boolean {
@@ -19,7 +21,7 @@ function isLive(dateStr: string, hasResult: boolean): boolean {
   return now >= start && now <= start + 115 * 60 * 1000;
 }
 
-export default function MatchCard({ match, compact = false }: MatchCardProps) {
+export default function MatchCard({ match, compact = false, prediction }: MatchCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isResult = match.home_score !== null && match.away_score !== null;
   const live = isLive(match.date, isResult);
@@ -104,6 +106,37 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
               <div className="px-4 py-2.5">
                 <p className="font-sans text-[12px] italic text-pitch-ink-mid leading-[1.5]">
                   {isResult ? match.recap_line : match.context_line}
+                </p>
+              </div>
+            </>
+          )}
+          {!isResult && prediction && (
+            <>
+              <div className="border-t border-pitch-rule mx-4" />
+              <div className="px-4 py-3">
+                <p className="font-sans text-[9px] uppercase tracking-[0.14em] text-pitch-ink-light mb-2">
+                  Predicted outcome
+                </p>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="font-sans text-[11px] font-medium text-pitch-ink w-8 text-left tabular-nums">
+                    {prediction.home_pct}%
+                  </span>
+                  <div className="flex-1 h-1.5 rounded-full overflow-hidden bg-pitch-rule">
+                    <div
+                      className="h-full rounded-full bg-pitch-green"
+                      style={{ width: `${prediction.home_pct}%` }}
+                    />
+                  </div>
+                  <span className="font-sans text-[11px] font-medium text-pitch-ink w-8 text-right tabular-nums">
+                    {prediction.away_pct}%
+                  </span>
+                </div>
+                <div className="flex justify-between mb-1.5">
+                  <span className="font-sans text-[10px] text-pitch-ink-light">{homeName}</span>
+                  <span className="font-sans text-[10px] text-pitch-ink-light">{awayName}</span>
+                </div>
+                <p className="font-sans text-[11px] italic text-pitch-ink-mid leading-[1.5]">
+                  {prediction.reason}
                 </p>
               </div>
             </>

@@ -13,9 +13,17 @@ interface TopPlayer {
   team: { name: string; group_letter: string } | null;
 }
 
+interface Goalkeeper {
+  id: string;
+  name: string;
+  team_id: string;
+  is_featured: boolean;
+}
+
 interface TournamentLeadersProps {
   topPlayers: TopPlayer[];
   completedMatches: Match[];
+  goalkeepers: Goalkeeper[];
 }
 
 interface LeaderRow {
@@ -59,7 +67,8 @@ function LeaderSection({ title, rows, unit, icon }: { title: string; rows: Leade
   );
 }
 
-export default function TournamentLeaders({ topPlayers, completedMatches }: TournamentLeadersProps) {
+export default function TournamentLeaders({ topPlayers, completedMatches, goalkeepers }: TournamentLeadersProps) {
+  const gkByTeam = Object.fromEntries(goalkeepers.map((gk) => [gk.team_id, gk]));
   // Top scorers
   const scorers: LeaderRow[] = topPlayers
     .filter((p) => p.goals > 0)
@@ -105,13 +114,16 @@ export default function TournamentLeaders({ topPlayers, completedMatches }: Tour
   const cleanSheets: LeaderRow[] = Object.entries(cleanSheetMap)
     .sort((a, b) => b[1].count - a[1].count)
     .slice(0, 5)
-    .map(([id, val]) => ({
-      id,
-      name: val.name,
-      team: val.name,
-      count: val.count,
-      href: `/teams/${teamSlug(val.name)}`,
-    }));
+    .map(([id, val]) => {
+      const gk = gkByTeam[id];
+      return {
+        id: gk ? gk.id : id,
+        name: gk ? gk.name : val.name,
+        team: val.name,
+        count: val.count,
+        href: gk?.is_featured ? `/players/${playerSlug(gk.name)}` : `/teams/${teamSlug(val.name)}`,
+      };
+    });
 
   return (
     <div>

@@ -86,7 +86,7 @@ const EXTRA_PLAYERS = [
 
 async function generateTeamBio(name: string): Promise<string> {
   const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5',
+    model: 'claude-sonnet-4-5',
     max_tokens: 200,
     messages: [{
       role: 'user',
@@ -98,7 +98,7 @@ async function generateTeamBio(name: string): Promise<string> {
 
 async function generatePlayerBio(name: string, team: string, position: string): Promise<string> {
   const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5',
+    model: 'claude-sonnet-4-5',
     max_tokens: 250,
     messages: [{
       role: 'user',

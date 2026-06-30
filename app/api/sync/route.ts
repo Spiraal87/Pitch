@@ -31,7 +31,7 @@ async function generateContextLine(
   standingsSummary: string
 ): Promise<string> {
   const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5',
+    model: 'claude-sonnet-4-5',
     max_tokens: 60,
     messages: [{
       role: 'user',
@@ -48,11 +48,11 @@ async function generateDailyBriefing(
   standingsSummary: string
 ): Promise<string> {
   const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5',
+    model: 'claude-sonnet-4-5',
     max_tokens: 500,
     messages: [{
       role: 'user',
-      content: `Write a tournament briefing for today (${date}) in 2-3 short paragraphs. Each paragraph should be 2-3 sentences. Paragraph 1: what happened yesterday and who moved through or is in trouble. Paragraph 2: what to watch today and why it matters. Paragraph 3 (optional): one broader storyline or thing that makes the group stage interesting right now. Tone: a friend texting you the highlights — casual, no jargon. Separate paragraphs with a blank line. No heading, no bullet points. Data: Recent results: ${recentResults}. Today's matches: ${todayMatches}. Standings summary: ${standingsSummary}`,
+      content: `Write a tournament briefing for today (${date}) in 2-3 short paragraphs. Each paragraph should be 2-3 sentences. Paragraph 1: recap recent results — use "today" or "yesterday" accurately based on the labels in the data. Paragraph 2: what to watch in upcoming matches today and why it matters. Paragraph 3 (optional): one broader storyline making the tournament interesting right now. Tone: a friend texting you the highlights — casual, no jargon. Separate paragraphs with a blank line. No heading, no bullet points. Data: Recent results (with timing): ${recentResults}. Today's upcoming matches: ${todayMatches}. Standings summary: ${standingsSummary}`,
     }],
   });
   return (msg.content[0] as { type: string; text: string }).text;
@@ -108,7 +108,18 @@ export async function GET(req: NextRequest) {
       away_score: m.status === 'FINISHED' ? (m.score?.fullTime?.away ?? null) : null,
       group_letter: m.group?.replace('GROUP_', '') ?? null,
       matchday: m.matchday,
-      stage: m.stage === 'GROUP_STAGE' ? 'group' : m.stage.toLowerCase(),
+      stage: (() => {
+        const STAGE_MAP: Record<string, string> = {
+          GROUP_STAGE: 'group',
+          LAST_32: 'round_of_32',
+          LAST_16: 'round_of_16',
+          QUARTER_FINALS: 'quarter_finals',
+          SEMI_FINALS: 'semi_finals',
+          THIRD_PLACE: 'third_place',
+          FINAL: 'final',
+        };
+        return STAGE_MAP[m.stage] ?? m.stage.toLowerCase();
+      })(),
     }));
 
     // Only upsert rows where both teams are known — unknown/TBD team IDs cause FK violations
@@ -206,8 +217,63 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // 5. Generate context lines for upcoming matches without one
+    // 5. Generate daily briefing (before context lines so timeouts don't block it)
     const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    const { data: todayMatchData } = await supabase
+      .from('matches')
+      .select('home_team:teams!matches_home_team_id_fkey(name), away_team:teams!matches_away_team_id_fkey(name), group_letter')
+      .gte('date', `${todayStr}T00:00:00`)
+      .lte('date', `${todayStr}T23:59:59`);
+
+    const { data: recentResultData } = await supabase
+      .from('matches')
+      .select('home_team:teams!matches_home_team_id_fkey(name), away_team:teams!matches_away_team_id_fkey(name), home_score, away_score, date')
+      .not('home_score', 'is', null)
+      .order('date', { ascending: false })
+      .limit(8);
+
+    type MatchRow = Record<string, unknown>;
+    const getTeamName = (team: unknown): string => {
+      if (Array.isArray(team)) return (team[0] as { name: string })?.name ?? '';
+      if (team && typeof team === 'object') return (team as { name: string }).name ?? '';
+      return '';
+    };
+
+    const yesterdayStr = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+    const todayUpcomingStr = (todayMatchData ?? []).map((m: MatchRow) =>
+      `${getTeamName(m.home_team)} vs ${getTeamName(m.away_team)}`
+    ).join(', ');
+
+    const recentResultStr = (recentResultData ?? []).map((m: MatchRow) => {
+      const matchDate = new Date(m.date as string).toISOString().split('T')[0];
+      const label = matchDate === todayStr ? 'today' : matchDate === yesterdayStr ? 'yesterday' : matchDate;
+      return `${getTeamName(m.home_team)} ${m.home_score}–${m.away_score} ${getTeamName(m.away_team)} (${label})`;
+    }).join('; ');
+
+    const topStandings = Object.values(standingsMap)
+      .sort((a, b) => b.points - a.points)
+      .slice(0, 8)
+      .map((s) => `${s.team_id} ${s.points}pts`)
+      .join(', ');
+
+    const briefingText = await generateDailyBriefing(
+      todayStr,
+      todayUpcomingStr || 'No more matches today',
+      recentResultStr || 'No recent results',
+      topStandings || 'Tournament not started'
+    );
+
+    await supabase.from('briefings').delete().eq('date', todayStr).eq('type', 'daily');
+    await supabase.from('briefings').insert({
+      date: todayStr,
+      type: 'daily',
+      text: briefingText,
+    });
+
+    // 6. Generate context lines for upcoming matches without one (best-effort after briefing)
     const nextWeek = new Date(today);
     nextWeek.setDate(today.getDate() + 7);
 
@@ -241,56 +307,6 @@ export async function GET(req: NextRequest) {
         .update({ context_line: contextLine })
         .eq('id', m.id);
     }
-
-    // 6. Generate daily briefing
-    const todayStr = today.toISOString().split('T')[0];
-
-    const { data: todayMatchData } = await supabase
-      .from('matches')
-      .select('home_team:teams!matches_home_team_id_fkey(name), away_team:teams!matches_away_team_id_fkey(name), group_letter')
-      .gte('date', `${todayStr}T00:00:00`)
-      .lte('date', `${todayStr}T23:59:59`);
-
-    const { data: recentResultData } = await supabase
-      .from('matches')
-      .select('home_team:teams!matches_home_team_id_fkey(name), away_team:teams!matches_away_team_id_fkey(name), home_score, away_score')
-      .not('home_score', 'is', null)
-      .order('date', { ascending: false })
-      .limit(8);
-
-    type MatchRow = Record<string, unknown>;
-    const getTeamName = (team: unknown): string => {
-      if (Array.isArray(team)) return (team[0] as { name: string })?.name ?? '';
-      if (team && typeof team === 'object') return (team as { name: string }).name ?? '';
-      return '';
-    };
-
-    const todayMatchStr = (todayMatchData ?? []).map((m: MatchRow) =>
-      `${getTeamName(m.home_team)} vs ${getTeamName(m.away_team)}`
-    ).join(', ');
-
-    const recentResultStr = (recentResultData ?? []).map((m: MatchRow) =>
-      `${getTeamName(m.home_team)} ${m.home_score}–${m.away_score} ${getTeamName(m.away_team)}`
-    ).join('; ');
-
-    const topStandings = Object.values(standingsMap)
-      .sort((a, b) => b.points - a.points)
-      .slice(0, 8)
-      .map((s) => `${s.team_id} ${s.points}pts`)
-      .join(', ');
-
-    const briefingText = await generateDailyBriefing(
-      todayStr,
-      todayMatchStr || 'No matches today',
-      recentResultStr || 'No recent results',
-      topStandings || 'Tournament not started'
-    );
-
-    await supabase.from('briefings').upsert({
-      date: todayStr,
-      type: 'daily',
-      text: briefingText,
-    }, { onConflict: 'date,type' });
 
     return NextResponse.json({
       ok: true,

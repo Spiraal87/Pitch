@@ -132,13 +132,14 @@ async function getHomeData(forceLive = false) {
     const now = new Date();
     const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999);
-    const [standingsRes, todayRes, upcomingRes, playersRes, topPlayersRes, allCompletedRes] = await Promise.all([
+    const [standingsRes, todayRes, upcomingRes, playersRes, topPlayersRes, allCompletedRes, goalkeepersRes] = await Promise.all([
       supabase.from('standings').select('*, team:teams(*)').order('group_letter').order('points', { ascending: false }),
       supabase.from('matches').select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)').gte('date', todayStart.toISOString()).lte('date', todayEnd.toISOString()).order('date'),
       supabase.from('matches').select('*, home_team:teams!matches_home_team_id_fkey(*), away_team:teams!matches_away_team_id_fkey(*)').gt('date', todayEnd.toISOString()).order('date').limit(12),
       supabase.from('players').select('*, team:teams(*)').eq('is_featured', true).limit(10),
       supabase.from('players').select('id, name, position, image_url, goals, assists, team:teams(name, group_letter)').or('goals.gt.0,assists.gt.0').order('goals', { ascending: false }).limit(20),
       supabase.from('matches').select('home_team_id, away_team_id, home_score, away_score, home_team:teams!matches_home_team_id_fkey(name), away_team:teams!matches_away_team_id_fkey(name)').not('home_score', 'is', null),
+      supabase.from('players').select('id, name, team_id, is_featured').eq('position', 'Goalkeeper'),
     ]);
     return {
       live: true,
@@ -150,6 +151,7 @@ async function getHomeData(forceLive = false) {
       topPlayers: topPlayersRes.data ?? [],
       players: playersRes.data ?? [],
       allCompletedMatches: allCompletedRes.data ?? [],
+      goalkeepers: goalkeepersRes.data ?? [],
     };
   }
 
@@ -193,7 +195,7 @@ async function getHomeData(forceLive = false) {
   const threeDaysOut = new Date(today);
   threeDaysOut.setUTCDate(today.getUTCDate() + 4);
 
-  const [teamsRes, todayRes, yesterdayRes, upcomingRes, allStandingsRes, topPlayersRes, playersRes, allCompletedRes] = await Promise.all([
+  const [teamsRes, todayRes, yesterdayRes, upcomingRes, allStandingsRes, topPlayersRes, playersRes, allCompletedRes, goalkeepersRes] = await Promise.all([
     supabase
       .from('teams')
       .select('id, name, group_letter, fifa_rank, bio_text, is_featured, generated_at, created_at')
@@ -237,6 +239,10 @@ async function getHomeData(forceLive = false) {
       .from('matches')
       .select('home_team_id, away_team_id, home_score, away_score, home_team:teams!matches_home_team_id_fkey(name), away_team:teams!matches_away_team_id_fkey(name)')
       .not('home_score', 'is', null),
+    supabase
+      .from('players')
+      .select('id, name, team_id, is_featured')
+      .eq('position', 'Goalkeeper'),
   ]);
 
   return {
@@ -249,6 +255,7 @@ async function getHomeData(forceLive = false) {
     allCompletedMatches: allCompletedRes.data ?? [],
     topPlayers: topPlayersRes.data ?? [],
     players: playersRes.data ?? [],
+    goalkeepers: goalkeepersRes.data ?? [],
   };
 }
 
@@ -318,15 +325,6 @@ function PreTournamentHome({ data }: { data: Awaited<ReturnType<typeof getHomeDa
               Here&apos;s everything you need to understand what&apos;s happening.
             </p>
           </div>
-          <Link
-            href="/briefing"
-            className="group block w-full max-w-[calc(100%-36px)] mx-auto bg-pitch-green text-white font-sans text-[13px] font-medium py-3 rounded-lg hover:bg-pitch-green-mid hover:shadow-md hover:-translate-y-0.5 transition-all text-center active:scale-95"
-          >
-            Get me up to speed{' '}
-            <span className="inline-block opacity-0 translate-x-[-4px] group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-              →
-            </span>
-          </Link>
           <TeamFinder teams={allTeams} />
         </div>
 
@@ -517,12 +515,6 @@ function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof g
 
         {/* Catch me up */}
         <div className="px-[18px] pb-2">
-          <Link
-            href="/briefing"
-            className="block w-full bg-pitch-green text-white font-sans text-[13px] font-medium py-3 rounded-lg hover:bg-pitch-green-mid transition-colors text-center"
-          >
-            Catch me up
-          </Link>
           <TeamFinder teams={allTeams} />
         </div>
 
@@ -606,6 +598,7 @@ function TournamentHome({ data, isPreview }: { data: Awaited<ReturnType<typeof g
           <TournamentLeaders
             topPlayers={(data as { topPlayers?: [] }).topPlayers ?? []}
             completedMatches={completedMatches}
+            goalkeepers={(data as { goalkeepers?: [] }).goalkeepers ?? []}
           />
         </>
 

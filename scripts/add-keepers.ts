@@ -31,7 +31,7 @@ const HEADERS = { 'User-Agent': 'PitchApp/1.0 (cdjohnsonzero@gmail.com)' };
 
 async function generateBio(name: string, team: string): Promise<string> {
   const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5',
+    model: 'claude-sonnet-4-5',
     max_tokens: 250,
     messages: [{
       role: 'user',

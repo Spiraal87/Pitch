@@ -62,7 +62,8 @@ create table if not exists briefings (
   date date not null,
   type text not null,
   text text not null,
-  generated_at timestamptz default now()
+  generated_at timestamptz default now(),
+  unique (date, type)
 );
 
 -- Indexes for common queries

@@ -39,7 +39,7 @@ export async function GET(
   const awayBio = match.away_team?.bio_text?.slice(0, 300) ?? '';
 
   const msg = await anthropic.messages.create({
-    model: 'claude-haiku-4-5',
+    model: 'claude-sonnet-4-5',
     max_tokens: 120,
     messages: [{
       role: 'user',

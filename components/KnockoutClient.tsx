@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Match } from '@/lib/types';
+import { MatchPrediction } from '@/app/knockout/page';
 import MatchCard from '@/components/MatchCard';
 import Flag from '@/components/Flag';
 import MatchModal from '@/components/MatchModal';
@@ -27,6 +28,7 @@ const ROUNDS = Object.keys(ROUND_CONFIG).map(key => ({ key, ...ROUND_CONFIG[key]
 
 interface KnockoutClientProps {
   matches: Match[];
+  predictions: Record<string, MatchPrediction>;
 }
 
 function FinalCard({ match }: { match: Match }) {
@@ -106,7 +108,7 @@ function FinalCard({ match }: { match: Match }) {
   );
 }
 
-export default function KnockoutClient({ matches }: KnockoutClientProps) {
+export default function KnockoutClient({ matches, predictions }: KnockoutClientProps) {
   const presentRounds = useMemo(
     () => ROUNDS.filter((r) => matches.some((m) => m.stage === r.key)),
     [matches]
@@ -207,7 +209,7 @@ export default function KnockoutClient({ matches }: KnockoutClientProps) {
       ) : (
         roundMatches.map((m) => {
           const isResult = m.home_score !== null && m.away_score !== null;
-          return <MatchCard key={m.id} match={m} compact={isResult} />;
+          return <MatchCard key={m.id} match={m} compact={isResult} prediction={predictions[m.id]} />;
         })
       )}
     </>
